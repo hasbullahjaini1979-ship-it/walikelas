@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIMARA – SD Negeri-1 Raja</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;min-height:100vh;padding:20px}
+.app{max-width:700px;margin:0 auto}
+.header{background:linear-gradient(135deg,#0c447c,#185fa5);border-radius:12px;padding:20px 24px;margin-bottom:20px;color:white;position:relative;overflow:hidden}
+.header::after{content:'';position:absolute;right:-30px;top:-30px;width:160px;height:160px;background:rgba(255,255,255,0.06);border-radius:50%}
+.header .sekolah{font-size:11px;opacity:0.75;letter-spacing:0.6px;margin-bottom:4px}
+.header h1{font-size:20px;font-weight:600;margin-bottom:4px}
+.header p{font-size:13px;opacity:0.85}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px 24px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+.screen{display:none}
+.screen.active{display:block}
+label.field-label{font-size:13px;color:#64748b;display:block;margin-bottom:6px;font-weight:500}
+input[type=text],input[type=password],select,textarea{width:100%;padding:9px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;margin-bottom:12px;outline:none;transition:border-color .2s;background:#fff;color:#1e293b}
+input[type=text]:focus,input[type=password]:focus,select:focus,textarea:focus{border-color:#185fa5;box-shadow:0 0 0 3px rgba(24,95,165,0.12)}
+textarea{resize:vertical;min-height:70px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;border:1px solid #cbd5e1;background:#fff;color:#334155;transition:all .15s}
+.btn:hover{background:#f1f5f9;border-color:#94a3b8}
+.btn-primary{background:#185fa5;color:white;border-color:#185fa5}
+.btn-primary:hover{background:#0c447c;border-color:#0c447c}
+.btn-danger{background:#a32d2d;color:white;border-color:#a32d2d}
+.btn-danger:hover{background:#791f1f}
+.btn-success{background:#166534;color:white;border-color:#166534}
+.btn-success:hover{background:#14532d}
+.btn-sm{padding:6px 12px;font-size:12px}
+.progress-wrap{margin:12px 0}
+.progress-bar{height:6px;background:#e2e8f0;border-radius:3px}
+.progress-fill{height:6px;background:#185fa5;border-radius:3px;transition:width .3s}
+.soal-num{font-size:12px;color:#64748b;margin-bottom:6px}
+.soal-text{font-size:15px;font-weight:500;color:#1e293b;margin-bottom:16px;line-height:1.65}
+.opsi-label{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:#334155}
+.opsi-label:hover{border-color:#93c5fd;background:#eff6ff}
+.opsi-label.selected{border-color:#185fa5;background:#dbeafe;color:#1e3a5f}
+.opsi-label input{margin-top:2px;accent-color:#185fa5;flex-shrink:0}
+.badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600}
+.badge-blue{background:#dbeafe;color:#1e40af}
+.badge-green{background:#dcfce7;color:#166534}
+.badge-amber{background:#fef3c7;color:#92400e}
+.badge-red{background:#fee2e2;color:#991b1b}
+.badge-purple{background:#ede9fe;color:#5b21b6}
+.badge-gray{background:#f1f5f9;color:#475569}
+.badge-orange{background:#ffedd5;color:#9a3412}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.divider{border:none;border-top:1px solid #e2e8f0;margin:16px 0}
+.meta{font-size:12px;color:#94a3b8}
+.kelas-badge{display:inline-block;padding:4px 14px;border-radius:20px;font-size:13px;font-weight:600}
+.kelas-1{background:#fee2e2;color:#991b1b}
+.kelas-2{background:#fef3c7;color:#92400e}
+.kelas-3{background:#ecfccb;color:#3f6212}
+.kelas-4{background:#dcfce7;color:#166534}
+.kelas-5{background:#dbeafe;color:#1e40af}
+.kelas-6{background:#ede9fe;color:#5b21b6}
+.result-table{width:100%;border-collapse:collapse;font-size:13px}
+.result-table th{text-align:left;padding:9px 10px;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;background:#f8fafc}
+.result-table td{padding:9px 10px;border-bottom:1px solid #f1f5f9;color:#334155}
+.result-table tr:hover td{background:#f8fafc}
+.alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;line-height:1.5}
+.alert-info{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
+.alert-success{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+.alert-warning{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+.alert-danger{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.tab-row{display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid #e2e8f0;overflow-x:auto}
+.tab{padding:8px 16px;font-size:13px;cursor:pointer;border:none;background:none;color:#64748b;border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:500;transition:color .15s;white-space:nowrap}
+.tab:hover{color:#185fa5}
+.tab.active{color:#185fa5;border-bottom-color:#185fa5}
+.menu-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:10px;cursor:pointer;transition:all .15s;background:#fff}
+.menu-item:hover{border-color:#93c5fd;background:#f0f7ff;transform:translateY(-1px);box-shadow:0 2px 8px rgba(24,95,165,0.1)}
+.menu-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.menu-title{font-weight:600;color:#1e293b;font-size:15px;margin-bottom:2px}
+.menu-sub{font-size:12px;color:#64748b}
+.stat-card{background:#f8fafc;border-radius:10px;padding:14px;text-align:center;border:1px solid #e2e8f0}
+.stat-num{font-size:28px;font-weight:700;color:#1e293b}
+.stat-label{font-size:12px;color:#64748b;margin-top:2px}
+/* ADMIN */
+.admin-section{margin-bottom:24px}
+.admin-section h3{font-size:14px;font-weight:600;color:#1e293b;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:8px}
+.list-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px;background:#fafafa;gap:8px}
+.list-item-info{flex:1;min-width:0}
+.list-item-name{font-size:14px;font-weight:500;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-item-sub{font-size:12px;color:#94a3b8;margin-top:2px}
+.list-item-actions{display:flex;gap:6px;flex-shrink:0}
+.soal-admin-card{border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:12px;background:#fafafa}
+.soal-admin-card .soal-num-label{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.opsi-input-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.opsi-input-row input[type=text]{margin-bottom:0;flex:1}
+.opsi-input-row .kunci-btn{width:36px;height:36px;border-radius:6px;border:2px solid #e2e8f0;background:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.opsi-input-row .kunci-btn.correct{border-color:#166534;background:#dcfce7;color:#166534}
+/* GURU SELECT */
+.guru-select-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px;cursor:pointer;transition:all .15s;background:#fff}
+.guru-select-item:hover{border-color:#93c5fd;background:#f0f7ff}
+.guru-select-item.selected{border-color:#185fa5;background:#dbeafe}
+.guru-avatar{width:36px;height:36px;border-radius:50%;background:#dbeafe;color:#1e40af;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+/* SPLASH */
+#screen-splash{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#0c447c,#185fa5);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;transition:opacity 0.5s}
+#screen-splash.fade-out{opacity:0;pointer-events:none}
+.splash-logo{width:80px;height:80px;background:rgba(255,255,255,0.15);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:20px;animation:splashPulse 1.5s ease-in-out infinite}
+@keyframes splashPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,255,255,0.3)}50%{transform:scale(1.05);box-shadow:0 0 0 16px rgba(255,255,255,0)}}
+.splash-title{font-size:24px;font-weight:700;letter-spacing:0.5px;margin-bottom:4px}
+.splash-sub{font-size:13px;opacity:0.8;margin-bottom:8px}
+.splash-school{font-size:11px;opacity:0.6;letter-spacing:1px;text-transform:uppercase;margin-bottom:36px}
+.splash-bar{width:200px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;overflow:hidden}
+.splash-bar-fill{height:100%;background:white;border-radius:2px;width:0%;transition:width 0.1s linear}
+.splash-status{font-size:12px;opacity:0.7;margin-top:12px;text-align:center}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.active{display:flex}
+.modal{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:16px;font-weight:600;color:#1e293b}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;padding:4px}
+.modal-close:hover{color:#334155}
+/* TOGGLE SWITCH */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9}
+.toggle-row:last-child{border-bottom:none}
+.toggle-label{font-size:14px;color:#334155;font-weight:500}
+.toggle-sub{font-size:12px;color:#94a3b8}
+.toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#cbd5e1;transition:.3s;border-radius:24px}
+.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:white;transition:.3s;border-radius:50%}
+input:checked+.toggle-slider{background:#185fa5}
+input:checked+.toggle-slider:before{transform:translateX(20px)}
+/* LOADING */
+.loading-spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.skeleton{background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:6px}
+@keyframes shimmer{to{background-position:-200% 0}}
+</style>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="screen-splash">
+  <div class="splash-logo"><i class="ti ti-school"></i></div>
+  <div class="splash-title">SIMARA</div>
+  <div class="splash-sub">Sistem Informasi Manajemen Sekolah Raja Satu</div>
+  <div class="splash-school">SD Negeri-1 Raja &middot; Kalimantan Tengah</div>
+  <div class="splash-bar"><div class="splash-bar-fill" id="splash-fill"></div></div>
+  <div class="splash-status" id="splash-status">Memuat aplikasi…</div>
+</div>
+
+<!-- MODAL EDIT GURU -->
+<div class="modal-overlay" id="modal-guru">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-guru-title">Tambah Guru</div>
+      <button class="modal-close" onclick="closeModal('modal-guru')">&times;</button>
+    </div>
+    <label class="field-label">Nama Lengkap <span style="color:#ef4444">*</span></label>
+    <input type="text" id="mg-nama" placeholder="Contoh: Siti Rahma, S.Pd.">
+    <label class="field-label">NIP (opsional)</label>
+    <input type="text" id="mg-nip" placeholder="Contoh: 198501012010011001">
+    <label class="field-label">Jabatan / Golongan</label>
+    <input type="text" id="mg-jabatan" placeholder="Contoh: Guru Kelas, III/b">
+    <div class="row" style="justify-content:flex-end;margin-top:8px">
+      <button class="btn" onclick="closeModal('modal-guru')">Batal</button>
+      <button class="btn btn-primary" onclick="simpanGuru()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDIT KELAS -->
+<div class="modal-overlay" id="modal-kelas">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-kelas-title">Tambah Kelas</div>
+      <button class="modal-close" onclick="closeModal('modal-kelas')">&times;</button>
+    </div>
+    <label class="field-label">Nama Kelas <span style="color:#ef4444">*</span></label>
+    <input type="text" id="mk-nama" placeholder="Contoh: Kelas 1A">
+    <label class="field-label">Kapasitas Siswa</label>
+    <input type="text" id="mk-kapasitas" placeholder="Contoh: 28">
+    <label class="field-label">Keterangan</label>
+    <input type="text" id="mk-ket" placeholder="Contoh: Ruang Utama">
+    <div class="row" style="justify-content:flex-end;margin-top:8px">
+      <button class="btn" onclick="closeModal('modal-kelas')">Batal</button>
+      <button class="btn btn-primary" onclick="simpanKelas()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+<div class="header">
+  <div class="sekolah">SD NEGERI-1 RAJA &middot; KOTAWARINGIN BARAT &middot; KALIMANTAN TENGAH</div>
+  <h1><i class="ti ti-school"></i> Asesmen Penentuan Wali Kelas</h1>
+  <p>Sistem Informasi Manajemen Sekolah Raja Satu (SIMARA)</p>
+</div>
+
+<!-- SCREEN: PILIH PERAN -->
+<div id="screen-role" class="screen">
+  <div class="card">
+    <p style="font-size:13px;color:#64748b;margin-bottom:16px">Silakan pilih akses yang sesuai:</p>
+    <div class="menu-item" onclick="showScreen('screen-login-guru')">
+      <div class="menu-icon" style="background:#dbeafe;color:#1e40af"><i class="ti ti-user-check"></i></div>
+      <div>
+        <div class="menu-title">Login sebagai Guru</div>
+        <div class="menu-sub">Ikuti asesmen penentuan wali kelas</div>
+      </div>
+      <i class="ti ti-chevron-right" style="margin-left:auto;color:#94a3b8"></i>
+    </div>
+    <div class="menu-item" onclick="showScreen('screen-login-kepsek')">
+      <div class="menu-icon" style="background:#ede9fe;color:#5b21b6"><i class="ti ti-shield-check"></i></div>
+      <div>
+        <div class="menu-title">Login sebagai Kepala Sekolah</div>
+        <div class="menu-sub">Lihat hasil penempatan wali kelas</div>
+      </div>
+      <i class="ti ti-chevron-right" style="margin-left:auto;color:#94a3b8"></i>
+    </div>
+    <div class="menu-item" onclick="showScreen('screen-login-admin')">
+      <div class="menu-icon" style="background:#ffedd5;color:#9a3412"><i class="ti ti-settings"></i></div>
+      <div>
+        <div class="menu-title">Login sebagai Admin</div>
+        <div class="menu-sub">Kelola data guru, kelas, dan soal</div>
+      </div>
+      <i class="ti ti-chevron-right" style="margin-left:auto;color:#94a3b8"></i>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: LOGIN GURU -->
+<div id="screen-login-guru" class="screen">
+  <div class="card">
+    <div style="margin-bottom:14px"><span class="badge badge-blue">Login Guru</span></div>
+    <label class="field-label">Pilih Nama Guru <span style="color:#ef4444">*</span></label>
+    <div id="guru-list-select" style="max-height:300px;overflow-y:auto;margin-bottom:12px">
+      <div class="alert alert-info"><i class="ti ti-loader ti-spin"></i> Memuat daftar guru…</div>
+    </div>
+    <label class="field-label">NIP (opsional)</label>
+    <input type="text" id="nip-guru" placeholder="Kosongkan jika tidak ada">
+    <div class="alert alert-info"><i class="ti ti-info-circle"></i> Pilih nama Anda dari daftar. Data asesmen akan dikirim ke Google Sheet SIMARA.</div>
+    <div class="row" style="margin-top:4px">
+      <button class="btn" onclick="showScreen('screen-role')"><i class="ti ti-arrow-left"></i> Kembali</button>
+      <button class="btn btn-primary" onclick="mulaiAsesmenGuru()">Mulai Asesmen <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: PERTANYAAN BENDAHARA -->
+<div id="screen-bendahara" class="screen">
+  <div class="card">
+    <div style="margin-bottom:14px"><span class="badge badge-amber">Tugas Tambahan</span></div>
+    <p class="soal-text">Apakah Anda saat ini menjabat sebagai <strong>Bendahara Komite</strong> di SD Negeri-1 Raja?</p>
+    <div class="alert alert-warning" style="margin-bottom:14px">
+      <i class="ti ti-alert-triangle"></i> Jika ya, Anda hanya akan dipertimbangkan untuk wali kelas 1 atau 2, sesuai skor asesmen.
+    </div>
+    <label class="opsi-label" id="label-bend-ya" onclick="pilihanBendahara('ya')">
+      <input type="radio" name="bend" value="ya" id="bend-ya"> <span>Ya, saya adalah Bendahara Komite</span>
+    </label>
+    <label class="opsi-label" id="label-bend-tidak" onclick="pilihanBendahara('tidak')">
+      <input type="radio" name="bend" value="tidak" id="bend-tidak"> <span>Tidak, saya bukan Bendahara Komite</span>
+    </label>
+    <div class="row" style="margin-top:16px">
+      <button class="btn" onclick="showScreen('screen-login-guru')"><i class="ti ti-arrow-left"></i> Kembali</button>
+      <button class="btn btn-primary" onclick="mulaiSoal()">Lanjut ke Soal <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: PERTANYAAN ANAK -->
+<div id="screen-anak" class="screen">
+  <div class="card">
+    <div style="margin-bottom:14px"><span class="badge badge-blue">Tugas Tambahan</span></div>
+    <p class="soal-text">Apakah Anda memiliki anak yang <strong>bersekolah di SD Negeri-1 Raja</strong>?</p>
+    <label class="opsi-label" id="label-anak-ya" onclick="pilihanAnak('ya')">
+      <input type="radio" name="anak" value="ya" id="anak-ya"> <span>Ya, saya memiliki anak yang bersekolah di sini</span>
+    </label>
+    <label class="opsi-label" id="label-anak-tidak" onclick="pilihanAnak('tidak')">
+      <input type="radio" name="anak" value="tidak" id="anak-tidak"> <span>Tidak, saya tidak memiliki anak di sekolah ini</span>
+    </label>
+    <div class="row" style="margin-top:16px">
+      <button class="btn" onclick="showScreen('screen-bendahara')"><i class="ti ti-arrow-left"></i> Kembali</button>
+      <button class="btn btn-primary" onclick="lanjutDariAnak()">Lanjut <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: KEBERATAN ANAK -->
+<div id="screen-anak-keberatan" class="screen">
+  <div class="card">
+    <div style="margin-bottom:14px"><span class="badge badge-blue">Tugas Tambahan</span></div>
+    <p class="soal-text">Apakah Anda <strong>tidak keberatan</strong> mengajar di kelas yang sama dengan anak Anda?</p>
+    <div class="alert alert-info" style="margin-bottom:14px">
+      <i class="ti ti-info-circle"></i> Jika Anda keberatan, kelas anak Anda akan dikecualikan dari penempatan Anda.
+    </div>
+    <label class="opsi-label" id="label-keberatan-tidak" onclick="pilihanKeberatan('tidak_masalah')">
+      <input type="radio" name="keberatan" value="tidak_masalah" id="keberatan-tidak"> <span>Tidak masalah, saya bersedia mengajar kelas anak saya</span>
+    </label>
+    <label class="opsi-label" id="label-keberatan-ya" onclick="pilihanKeberatan('tidak_mau')">
+      <input type="radio" name="keberatan" value="tidak_mau" id="keberatan-ya"> <span>Saya tidak mau mengajar kelas anak saya</span>
+    </label>
+    <div class="row" style="margin-top:16px">
+      <button class="btn" onclick="showScreen('screen-anak')"><i class="ti ti-arrow-left"></i> Kembali</button>
+      <button class="btn btn-primary" onclick="lanjutDariKeberatan()">Lanjut <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: KELAS ANAK -->
+<div id="screen-kelas-anak" class="screen">
+  <div class="card">
+    <div style="margin-bottom:14px"><span class="badge badge-amber">Tugas Tambahan</span></div>
+    <p class="soal-text">Anak Anda saat ini duduk di kelas berapa?</p>
+    <div class="alert alert-warning" style="margin-bottom:14px">
+      <i class="ti ti-alert-triangle"></i> Anda tidak akan ditempatkan sebagai wali kelas di kelas tersebut.
+    </div>
+    <div id="opsi-kelas-anak" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"></div>
+    <div class="row" style="margin-top:16px">
+      <button class="btn" onclick="showScreen('screen-anak-keberatan')"><i class="ti ti-arrow-left"></i> Kembali</button>
+      <button class="btn btn-primary" onclick="lanjutDariKelasAnak()">Lanjut ke Soal <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: SOAL -->
+<div id="screen-soal" class="screen">
+  <div class="card">
+    <div class="row" style="margin-bottom:8px;justify-content:space-between">
+      <span id="soal-badge" class="badge badge-blue">Matematika</span>
+      <span class="meta" id="soal-counter">Soal 1 dari 10</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:10%"></div></div>
+    </div>
+    <p class="soal-text" id="soal-text"></p>
+    <div id="opsi-container"></div>
+    <div class="row" style="margin-top:16px;justify-content:flex-end">
+      <button class="btn btn-primary" id="btn-soal-lanjut" onclick="jawabanBerikutnya()">Berikutnya <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: SELESAI GURU -->
+<div id="screen-selesai" class="screen">
+  <div class="card" style="text-align:center;padding:32px 24px">
+    <div style="width:64px;height:64px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:32px;color:#166534">
+      <i class="ti ti-circle-check"></i>
+    </div>
+    <h2 style="font-size:20px;font-weight:600;margin-bottom:8px;color:#1e293b">Asesmen Selesai!</h2>
+    <p style="font-size:14px;color:#64748b;margin-bottom:20px;line-height:1.6" id="pesan-selesai"></p>
+    <div style="background:#f8fafc;border-radius:10px;padding:16px;margin-bottom:20px;display:inline-block;min-width:160px;border:1px solid #e2e8f0">
+      <div style="font-size:12px;color:#64748b;margin-bottom:4px">Skor Anda</div>
+      <div style="font-size:40px;font-weight:700;color:#185fa5" id="skor-akhir">-</div>
+      <div style="font-size:12px;color:#64748b">dari 100</div>
+    </div>
+    <div id="gs-selesai-status" class="alert alert-info">
+      <i class="ti ti-loader ti-spin"></i> Mengirim data ke Google Sheet…
+    </div>
+    <button class="btn btn-primary" onclick="resetApp()" style="margin-top:12px">Kembali ke Halaman Utama</button>
+  </div>
+</div>
+
+<!-- SCREEN: LOGIN KEPSEK -->
+<div id="screen-login-kepsek" class="screen">
+  <div class="card">
+    <div style="margin-bottom:14px"><span class="badge badge-purple">Akses Kepala Sekolah</span></div>
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="width:56px;height:56px;background:#ede9fe;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:26px;color:#5b21b6">
+        <i class="ti ti-lock"></i>
+      </div>
+      <p style="font-size:13px;color:#64748b">Masukkan password untuk mengakses hasil asesmen</p>
+    </div>
+    <label class="field-label">Password Kepala Sekolah</label>
+    <input type="password" id="pass-kepsek" placeholder="Masukkan password" onkeydown="if(event.key==='Enter')loginKepsek()">
+    <div id="kepsek-error" class="alert alert-danger" style="display:none">
+      <i class="ti ti-alert-circle"></i> Password salah. Silakan coba lagi.
+    </div>
+    <div class="row" style="margin-top:4px">
+      <button class="btn" onclick="showScreen('screen-role')"><i class="ti ti-arrow-left"></i> Kembali</button>
+      <button class="btn btn-primary" onclick="loginKepsek()"><i class="ti ti-lock-open"></i> Masuk</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: DASHBOARD KEPSEK -->
+<div id="screen-dashboard" class="screen">
+  <div class="card">
+    <div class="row" style="margin-bottom:16px;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div>
+        <span class="badge badge-purple">Dashboard Kepala Sekolah</span>
+        <p class="meta" style="margin-top:4px">Hasil Asesmen Penentuan Wali Kelas</p>
+      </div>
+      <div class="row" style="gap:8px;flex-wrap:wrap">
+        <button class="btn" onclick="muatUlangDashboard()" style="font-size:13px"><i class="ti ti-refresh"></i> Muat dari Sheet</button>
+        <button class="btn" onclick="kirimKeGoogleSheet()" style="font-size:13px"><i class="ti ti-table-export"></i> Simpan ke Sheet</button>
+        <button class="btn" onclick="hapusSemuaData()" style="font-size:13px;color:#991b1b;border-color:#fecaca"><i class="ti ti-trash"></i> Hapus Data</button>
+        <button class="btn btn-danger" onclick="logoutKepsek()" style="font-size:13px"><i class="ti ti-logout"></i> Keluar</button>
+      </div>
+    </div>
+    <div id="gs-status" style="display:none"></div>
+    <div id="stats-row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:16px"></div>
+    <div class="tab-row">
+      <button class="tab active" id="btn-tab-rekap" onclick="switchTab('tab-rekap','btn-tab-rekap')">Rekap Penempatan</button>
+      <button class="tab" id="btn-tab-detail" onclick="switchTab('tab-detail','btn-tab-detail')">Data Detail</button>
+    </div>
+    <div id="tab-rekap"><div id="rekap-penempatan"></div></div>
+    <div id="tab-detail" style="display:none"><div style="overflow-x:auto"><table class="result-table" id="tabel-detail"></table></div></div>
+    <div id="no-data" class="alert alert-warning" style="display:none">
+      <i class="ti ti-inbox"></i> Belum ada data asesmen. Minta guru untuk mengisi asesmen terlebih dahulu.
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: LOGIN ADMIN -->
+<div id="screen-login-admin" class="screen">
+  <div class="card">
+    <div style="margin-bottom:14px"><span class="badge badge-orange">Akses Admin</span></div>
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="width:56px;height:56px;background:#ffedd5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:26px;color:#9a3412">
+        <i class="ti ti-settings"></i>
+      </div>
+      <p style="font-size:13px;color:#64748b">Masukkan password Admin untuk mengelola data</p>
+    </div>
+    <label class="field-label">Password Admin</label>
+    <input type="password" id="pass-admin" placeholder="Masukkan password admin" onkeydown="if(event.key==='Enter')loginAdmin()">
+    <div id="admin-error" class="alert alert-danger" style="display:none">
+      <i class="ti ti-alert-circle"></i> Password salah. Silakan coba lagi.
+    </div>
+    <div class="row" style="margin-top:4px">
+      <button class="btn" onclick="showScreen('screen-role')"><i class="ti ti-arrow-left"></i> Kembali</button>
+      <button class="btn btn-primary" onclick="loginAdmin()" style="background:#9a3412;border-color:#9a3412"><i class="ti ti-lock-open"></i> Masuk Admin</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: DASHBOARD ADMIN -->
+<div id="screen-admin" class="screen">
+  <div class="card">
+    <div class="row" style="margin-bottom:16px;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div>
+        <span class="badge badge-orange">Panel Admin</span>
+        <p class="meta" style="margin-top:4px">Kelola Data Aplikasi SIMARA</p>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="logoutAdmin()"><i class="ti ti-logout"></i> Keluar</button>
+    </div>
+    <div id="admin-sync-status" style="display:none"></div>
+
+    <div class="tab-row">
+      <button class="tab active" id="btn-atab-guru" onclick="switchAdminTab('atab-guru','btn-atab-guru')"><i class="ti ti-users"></i> Guru</button>
+      <button class="tab" id="btn-atab-kelas" onclick="switchAdminTab('atab-kelas','btn-atab-kelas')"><i class="ti ti-building-school"></i> Kelas</button>
+      <button class="tab" id="btn-atab-soal" onclick="switchAdminTab('atab-soal','btn-atab-soal')"><i class="ti ti-list-check"></i> Soal</button>
+      <button class="tab" id="btn-atab-setting" onclick="switchAdminTab('atab-setting','btn-atab-setting')"><i class="ti ti-adjustments"></i> Pengaturan</button>
+    </div>
+
+    <!-- TAB: GURU -->
+    <div id="atab-guru">
+      <div class="admin-section">
+        <h3><i class="ti ti-users" style="color:#185fa5"></i> Daftar Guru</h3>
+        <button class="btn btn-primary btn-sm" onclick="openModalGuru()" style="margin-bottom:12px"><i class="ti ti-plus"></i> Tambah Guru</button>
+        <div id="admin-guru-list">
+          <div class="skeleton" style="height:50px;margin-bottom:8px"></div>
+          <div class="skeleton" style="height:50px;margin-bottom:8px"></div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn btn-sm" onclick="syncGuruKeSheet()"><i class="ti ti-cloud-upload"></i> Simpan Guru ke Google Sheet</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: KELAS -->
+    <div id="atab-kelas" style="display:none">
+      <div class="admin-section">
+        <h3><i class="ti ti-building-school" style="color:#185fa5"></i> Daftar Kelas</h3>
+        <button class="btn btn-primary btn-sm" onclick="openModalKelas()" style="margin-bottom:12px"><i class="ti ti-plus"></i> Tambah Kelas</button>
+        <div id="admin-kelas-list">
+          <div class="skeleton" style="height:50px;margin-bottom:8px"></div>
+          <div class="skeleton" style="height:50px;margin-bottom:8px"></div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn btn-sm" onclick="syncKelasKeSheet()"><i class="ti ti-cloud-upload"></i> Simpan Kelas ke Google Sheet</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SOAL -->
+    <div id="atab-soal" style="display:none">
+      <div class="admin-section">
+        <h3><i class="ti ti-list-check" style="color:#185fa5"></i> Bank Soal Asesmen</h3>
+        <div class="alert alert-info" style="margin-bottom:12px">
+          <i class="ti ti-info-circle"></i> Klik ikon <strong>kunci</strong> (🔑) di samping jawaban untuk menandai jawaban yang benar.
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="tambahSoalBaru()" style="margin-bottom:12px"><i class="ti ti-plus"></i> Tambah Soal Baru</button>
+        <div id="admin-soal-list"></div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn btn-sm" onclick="syncSoalKeSheet()"><i class="ti ti-cloud-upload"></i> Simpan Soal ke Google Sheet</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: PENGATURAN -->
+    <div id="atab-setting" style="display:none">
+      <div class="admin-section">
+        <h3><i class="ti ti-adjustments" style="color:#185fa5"></i> Pengaturan Soal & Aplikasi</h3>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Acak Urutan Soal</div>
+            <div class="toggle-sub">Setiap guru mendapat urutan soal yang berbeda</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-acak-soal" onchange="saveSetting()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Acak Pilihan Jawaban</div>
+            <div class="toggle-sub">Urutan A/B/C/D diacak setiap ditampilkan</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-acak-opsi" onchange="saveSetting()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+      <div class="admin-section">
+        <h3><i class="ti ti-link" style="color:#185fa5"></i> Konfigurasi Google Sheet</h3>
+        <div class="alert alert-success" style="margin-bottom:12px">
+          <i class="ti ti-circle-check"></i> URL Google Apps Script sudah tertanam di aplikasi. Tidak perlu konfigurasi manual.
+        </div>
+        <label class="field-label">Password Kepala Sekolah</label>
+        <input type="text" id="setting-kepsek-pass" placeholder="sdn1raja2025">
+        <label class="field-label">Password Admin</label>
+        <input type="text" id="setting-admin-pass" placeholder="admin2025">
+        <!-- URL GAS disimpan hidden agar loadSettingUI tidak error -->
+        <input type="hidden" id="setting-gs-url">
+        <div class="row" style="margin-top:4px">
+          <button class="btn btn-primary" onclick="saveSettingConfig()"><i class="ti ti-device-floppy"></i> Simpan Konfigurasi</button>
+          <button class="btn btn-sm" onclick="testGoogleSheet()"><i class="ti ti-wifi"></i> Test Koneksi Sheet</button>
+        </div>
+        <div id="gs-test-status" style="display:none;margin-top:12px"></div>
+      </div>
+      <div class="admin-section">
+        <h3><i class="ti ti-cloud-download" style="color:#185fa5"></i> Sinkronisasi Data</h3>
+        <p style="font-size:13px;color:#64748b;margin-bottom:12px">Tarik data terbaru dari Google Sheet ke aplikasi ini.</p>
+        <button class="btn" onclick="tarikDataDariSheet()"><i class="ti ti-refresh"></i> Tarik Data dari Google Sheet</button>
+        <div id="sync-status" style="display:none;margin-top:12px"></div>
+      </div>
+      <div class="admin-section">
+        <h3><i class="ti ti-trash" style="color:#991b1b"></i> Reset Data</h3>
+        <p style="font-size:13px;color:#64748b;margin-bottom:12px">Hapus seluruh data asesmen guru yang tersimpan lokal.</p>
+        <button class="btn" style="color:#991b1b;border-color:#fecaca" onclick="hapusSemuaData()"><i class="ti ti-trash"></i> Hapus Data Asesmen</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- end .app -->
+
+<script>
+// ========================================
+// KONFIGURASI DEFAULT
+// ========================================
+const GAS_URL_HARDCODED = "https://script.google.com/macros/s/AKfycbwwQmqw5nEqT1QRVt7PMoAZ6i2H8b0Z-6dBD4KJPwcJypqAknp6y9T75fYVQwcA-tCLsw/exec";
+
+let CONFIG = {
+  GS_URL: GAS_URL_HARDCODED,
+  KEPSEK_PASS: "sdn1raja2025",
+  ADMIN_PASS: "admin2025",
+  acakSoal: false,
+  acakOpsi: false
+};
+
+// ========================================
+// DATA DEFAULT
+// ========================================
+let SOAL_DEFAULT = [
+  {mapel:"Matematika",teks:"Hasil dari 1.250 ÷ 25 + 48 × 3 adalah …",opsi:["194","184","202","186"],jawaban:0},
+  {mapel:"Matematika",teks:"Sebuah kebun berbentuk persegi panjang dengan panjang 24 m dan lebar 18 m. Berapa luas kebun tersebut?",opsi:["392 m²","432 m²","402 m²","452 m²"],jawaban:1},
+  {mapel:"Matematika",teks:"FPB dari 48 dan 60 adalah …",opsi:["6","8","12","24"],jawaban:2},
+  {mapel:"Matematika",teks:"Jarak kota A ke kota B adalah 360 km. Mobil melaju dengan kecepatan rata-rata 90 km/jam. Berapa lama perjalanan tersebut?",opsi:["3 jam","3,5 jam","4 jam","4,5 jam"],jawaban:2},
+  {mapel:"Matematika",teks:"Nilai dari 2³ + 4² − √25 adalah …",opsi:["19","23","21","17"],jawaban:0},
+  {mapel:"Bahasa Indonesia",teks:"Kalimat manakah yang menggunakan ejaan dan tanda baca yang BENAR?",opsi:["Ibu pergi ke Pasar, dan Ayah pergi ke Kantor.","Ibu pergi ke pasar dan ayah pergi ke kantor.","ibu pergi ke pasar dan ayah pergi ke kantor.","Ibu pergi ke pasar, dan Ayah pergi ke kantor."],jawaban:1},
+  {mapel:"Bahasa Indonesia",teks:"Sinonim kata 'gagah' adalah …",opsi:["Lemah","Perkasa","Kurus","Malas"],jawaban:1},
+  {mapel:"Bahasa Indonesia",teks:"Perhatikan kalimat: 'Buku itu sangat tebal.' Kata 'tebal' berfungsi sebagai …",opsi:["Kata benda","Kata kerja","Kata sifat","Kata keterangan"],jawaban:2},
+  {mapel:"Bahasa Indonesia",teks:"Paragraf yang kalimat utamanya berada di awal paragraf disebut paragraf …",opsi:["Induktif","Deduktif","Campuran","Naratif"],jawaban:1},
+  {mapel:"Bahasa Indonesia",teks:"Antonim kata 'dermawan' adalah …",opsi:["Murah hati","Pelit","Rajin","Sabar"],jawaban:1}
+];
+
+let GURU_DEFAULT = [
+  {id:1, nama:"Siti Rahma, S.Pd.", nip:"198501012010011001", jabatan:"Guru Kelas, III/b"},
+  {id:2, nama:"Ahmad Fauzi, S.Pd.", nip:"198702052012011002", jabatan:"Guru Kelas, III/a"},
+  {id:3, nama:"Dewi Astuti, S.Pd.", nip:"199003152013012003", jabatan:"Guru Kelas, II/d"},
+  {id:4, nama:"Rudi Hartono, S.Pd.", nip:"198806202014011004", jabatan:"Guru Kelas, III/a"},
+  {id:5, nama:"Nurul Hikmah, S.Pd.", nip:"199110102015012005", jabatan:"Guru Kelas, II/c"},
+  {id:6, nama:"Mulyadi, S.Pd.", nip:"197905152008011006", jabatan:"Guru Senior, IV/a"}
+];
+
+let KELAS_DEFAULT = [
+  {id:1, nama:"Kelas 1", kapasitas:28, keterangan:"Ruang A"},
+  {id:2, nama:"Kelas 2", kapasitas:27, keterangan:"Ruang B"},
+  {id:3, nama:"Kelas 3", kapasitas:30, keterangan:"Ruang C"},
+  {id:4, nama:"Kelas 4", kapasitas:29, keterangan:"Ruang D"},
+  {id:5, nama:"Kelas 5", kapasitas:28, keterangan:"Ruang E"},
+  {id:6, nama:"Kelas 6", kapasitas:26, keterangan:"Ruang F"}
+];
+
+// ========================================
+// STATE
+// ========================================
+let state = {nama:"",nip:"",bendahara:false,punyaAnak:false,keberatan:false,kelasAnak:null,soalIdx:0,jawaban:[],skorAkhir:0,soalAktif:[]};
+let dataGuru = [];
+let editGuruIdx = null;
+let editKelasIdx = null;
+
+function getSOAL(){return JSON.parse(localStorage.getItem("simara_soal")||"null")||JSON.parse(JSON.stringify(SOAL_DEFAULT));}
+function getGURU(){return JSON.parse(localStorage.getItem("simara_guru")||"null")||JSON.parse(JSON.stringify(GURU_DEFAULT));}
+function getKELAS(){return JSON.parse(localStorage.getItem("simara_kelas")||"null")||JSON.parse(JSON.stringify(KELAS_DEFAULT));}
+function getCONFIG(){
+  const stored = JSON.parse(localStorage.getItem("simara_config")||"{}");
+  const merged = Object.assign({},CONFIG,stored);
+  // URL GAS selalu gunakan yang tertanam di kode, tidak bisa diubah dari luar
+  merged.GS_URL = GAS_URL_HARDCODED;
+  return merged;
+}
+function saveSOAL(d){localStorage.setItem("simara_soal",JSON.stringify(d));}
+function saveGURU(d){localStorage.setItem("simara_guru",JSON.stringify(d));}
+function saveKELAS(d){localStorage.setItem("simara_kelas",JSON.stringify(d));}
+function saveCONFIG(d){localStorage.setItem("simara_config",JSON.stringify(d));}
+
+// ========================================
+// SPLASH SCREEN
+// ========================================
+async function initSplash(){
+  const fill = document.getElementById('splash-fill');
+  const status = document.getElementById('splash-status');
+  const steps = [
+    {pct:20, msg:"Memuat konfigurasi…"},
+    {pct:45, msg:"Mengambil data dari Google Sheet…"},
+    {pct:70, msg:"Memuat daftar guru & soal…"},
+    {pct:90, msg:"Menyiapkan asesmen…"},
+    {pct:100, msg:"Siap!"}
+  ];
+  for(const s of steps){
+    await delay(400);
+    fill.style.width = s.pct+'%';
+    status.textContent = s.msg;
+    if(s.pct===45) await tarikDataSplash();
+  }
+  await delay(500);
+  document.getElementById('screen-splash').classList.add('fade-out');
+  setTimeout(()=>{
+    document.getElementById('screen-splash').style.display='none';
+    showScreen('screen-role');
+  },500);
+}
+
+function delay(ms){return new Promise(r=>setTimeout(r,ms));}
+
+async function tarikDataSplash(){
+  const statusEl = document.getElementById('splash-status');
+  try{
+    statusEl.textContent = "Mengambil data guru, soal & asesmen dari Google Sheet…";
+    const resp = await fetch(GAS_URL_HARDCODED + '?action=getData');
+    const json = await resp.json();
+    if(json.guru && json.guru.length > 0) saveGURU(json.guru);
+    if(json.kelas && json.kelas.length > 0) saveKELAS(json.kelas);
+    if(json.soal && json.soal.length > 0) saveSOAL(json.soal);
+    if(json.asesmen && json.asesmen.length > 0){
+      // Gabungkan data asesmen dari sheet dengan data lokal (hindari duplikat by id)
+      const lokal = JSON.parse(localStorage.getItem("data_wali_kelas_sdn1")||"[]");
+      const lokalIds = new Set(lokal.map(d=>d.id));
+      const baru = json.asesmen.filter(d=>!lokalIds.has(d.id));
+      const gabung = [...lokal, ...baru];
+      localStorage.setItem("data_wali_kelas_sdn1", JSON.stringify(gabung));
+    }
+    statusEl.textContent = "Data berhasil dimuat dari Google Sheet!";
+  }catch(e){
+    // Gagal fetch → pakai data lokal / default, tidak masalah
+    statusEl.textContent = "Menggunakan data lokal…";
+  }
+}
+
+// ========================================
+// NAVIGASI
+// ========================================
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ========================================
+// LOGIN GURU — PILIH NAMA
+// ========================================
+function renderGuruSelect(){
+  const list = getGURU();
+  const cont = document.getElementById('guru-list-select');
+  if(!list||list.length===0){
+    cont.innerHTML='<div class="alert alert-warning"><i class="ti ti-alert-triangle"></i> Belum ada data guru. Hubungi Admin.</div>';
+    return;
+  }
+  cont.innerHTML = list.map((g,i)=>{
+    const inisial = g.nama.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase();
+    return `<div class="guru-select-item" id="gsi-${i}" onclick="pilihGuru(${i},'${g.nama.replace(/'/g,"\\'")}')">
+      <div class="guru-avatar">${inisial}</div>
+      <div>
+        <div style="font-weight:600;font-size:14px;color:#1e293b">${g.nama}</div>
+        <div style="font-size:12px;color:#94a3b8">${g.jabatan||''} ${g.nip?'· '+g.nip:''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function pilihGuru(idx, nama){
+  document.querySelectorAll('.guru-select-item').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('gsi-'+idx).classList.add('selected');
+  state.namaTerpilih = nama;
+}
+
+function mulaiAsesmenGuru(){
+  if(!state.namaTerpilih){alert("Pilih nama Anda terlebih dahulu.");return;}
+  state.nama = state.namaTerpilih;
+  state.nip = document.getElementById('nip-guru').value.trim();
+  showScreen('screen-bendahara');
+}
+
+// ========================================
+// ALUR ASESMEN
+// ========================================
+function pilihanBendahara(v){
+  document.getElementById('label-bend-ya').classList.toggle('selected',v==='ya');
+  document.getElementById('label-bend-tidak').classList.toggle('selected',v==='tidak');
+  document.getElementById('bend-ya').checked=v==='ya';
+  document.getElementById('bend-tidak').checked=v==='tidak';
+}
+
+function mulaiSoal(){
+  const v=document.querySelector('input[name=bend]:checked');
+  if(!v){alert("Harap pilih salah satu jawaban.");return;}
+  state.bendahara=v.value==='ya';
+  showScreen('screen-anak');
+}
+
+function pilihanAnak(v){
+  document.getElementById('label-anak-ya').classList.toggle('selected',v==='ya');
+  document.getElementById('label-anak-tidak').classList.toggle('selected',v==='tidak');
+  document.getElementById('anak-ya').checked=v==='ya';
+  document.getElementById('anak-tidak').checked=v==='tidak';
+}
+
+function lanjutDariAnak(){
+  const v=document.querySelector('input[name=anak]:checked');
+  if(!v){alert("Harap pilih salah satu jawaban.");return;}
+  if(v.value==='tidak'){state.punyaAnak=false;state.keberatan=false;state.kelasAnak=null;mulaiSoalSekarang();}
+  else{state.punyaAnak=true;showScreen('screen-anak-keberatan');}
+}
+
+function pilihanKeberatan(v){
+  document.getElementById('label-keberatan-tidak').classList.toggle('selected',v==='tidak_masalah');
+  document.getElementById('label-keberatan-ya').classList.toggle('selected',v==='tidak_mau');
+  document.getElementById('keberatan-tidak').checked=v==='tidak_masalah';
+  document.getElementById('keberatan-ya').checked=v==='tidak_mau';
+}
+
+function lanjutDariKeberatan(){
+  const v=document.querySelector('input[name=keberatan]:checked');
+  if(!v){alert("Harap pilih salah satu jawaban.");return;}
+  if(v.value==='tidak_masalah'){state.keberatan=false;state.kelasAnak=null;mulaiSoalSekarang();}
+  else{
+    state.keberatan=true;
+    const cont=document.getElementById('opsi-kelas-anak');
+    cont.innerHTML='';
+    const kelasClass={1:'kelas-1',2:'kelas-2',3:'kelas-3',4:'kelas-4',5:'kelas-5',6:'kelas-6'};
+    [1,2,3,4,5,6].forEach(k=>{
+      const btn=document.createElement('button');
+      btn.className='btn';
+      btn.id=`btn-kelas-${k}`;
+      btn.style.cssText='justify-content:center;padding:14px 8px;font-size:15px;font-weight:600;width:100%';
+      btn.innerHTML=`<span class="kelas-badge ${kelasClass[k]}">Kelas ${k}</span>`;
+      btn.onclick=()=>{
+        document.querySelectorAll('#opsi-kelas-anak .btn').forEach(b=>{b.style.background='';b.style.borderColor='';});
+        btn.style.background='#dbeafe';btn.style.borderColor='#185fa5';state.kelasAnak=k;
+      };
+      cont.appendChild(btn);
+    });
+    showScreen('screen-kelas-anak');
+  }
+}
+
+function lanjutDariKelasAnak(){if(!state.kelasAnak){alert("Pilih kelas anak Anda terlebih dahulu.");return;}mulaiSoalSekarang();}
+
+function mulaiSoalSekarang(){
+  const cfg = getCONFIG();
+  let soalList = JSON.parse(JSON.stringify(getSOAL()));
+  if(cfg.acakSoal) soalList = shuffle(soalList);
+  if(cfg.acakOpsi){
+    soalList = soalList.map(s=>{
+      const pairs = s.opsi.map((o,i)=>({text:o,correct:i===s.jawaban}));
+      const shuffled = shuffle(pairs);
+      return {...s, opsi:shuffled.map(p=>p.text), jawaban:shuffled.findIndex(p=>p.correct)};
+    });
+  }
+  state.soalAktif = soalList;
+  state.soalIdx=0;state.jawaban=[];
+  tampilkanSoal();showScreen('screen-soal');
+}
+
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function tampilkanSoal(){
+  const soal = state.soalAktif;
+  const s=soal[state.soalIdx];
+  const isMatematika=s.mapel==='Matematika';
+  document.getElementById('soal-badge').textContent=s.mapel;
+  document.getElementById('soal-badge').className='badge '+(isMatematika?'badge-blue':'badge-green');
+  document.getElementById('soal-counter').textContent=`Soal ${state.soalIdx+1} dari ${soal.length}`;
+  document.getElementById('progress-fill').style.width=`${((state.soalIdx+1)/soal.length)*100}%`;
+  document.getElementById('soal-text').textContent=`${state.soalIdx+1}. ${s.teks}`;
+  const cont=document.getElementById('opsi-container');
+  cont.innerHTML='';
+  s.opsi.forEach((o,i)=>{
+    const lbl=document.createElement('label');
+    lbl.className='opsi-label'+(state.jawaban[state.soalIdx]===i?' selected':'');
+    lbl.innerHTML=`<input type="radio" name="opsi" value="${i}" ${state.jawaban[state.soalIdx]===i?'checked':''}> <span>${String.fromCharCode(65+i)}. ${o}</span>`;
+    lbl.onclick=()=>{
+      document.querySelectorAll('.opsi-label').forEach(l=>l.classList.remove('selected'));
+      lbl.classList.add('selected');state.jawaban[state.soalIdx]=i;
+    };
+    cont.appendChild(lbl);
+  });
+  const btn=document.getElementById('btn-soal-lanjut');
+  btn.innerHTML=state.soalIdx<soal.length-1?'Berikutnya <i class="ti ti-arrow-right"></i>':'Selesai <i class="ti ti-check"></i>';
+}
+
+function jawabanBerikutnya(){
+  const pilihan=document.querySelector('input[name=opsi]:checked');
+  if(pilihan) state.jawaban[state.soalIdx]=parseInt(pilihan.value);
+  if(state.jawaban[state.soalIdx]===undefined){alert("Pilih jawaban terlebih dahulu.");return;}
+  if(state.soalIdx<state.soalAktif.length-1){state.soalIdx++;tampilkanSoal();}
+  else hitungSkor();
+}
+
+async function hitungSkor(){
+  const soal = state.soalAktif;
+  let benar=0;
+  soal.forEach((s,i)=>{if(state.jawaban[i]===s.jawaban)benar++;});
+  state.skorAkhir=Math.round((benar/soal.length)*100);
+  const entry={
+    nama:state.nama,nip:state.nip,bendahara:state.bendahara,
+    punyaAnak:state.punyaAnak,keberatan:state.keberatan,kelasAnak:state.kelasAnak,
+    skor:state.skorAkhir,timestamp:new Date().toLocaleString('id-ID'),id:String(Date.now())
+  };
+  dataGuru=JSON.parse(localStorage.getItem("data_wali_kelas_sdn1")||"[]");
+  dataGuru.push(entry);
+  localStorage.setItem("data_wali_kelas_sdn1",JSON.stringify(dataGuru));
+  document.getElementById('skor-akhir').textContent=state.skorAkhir;
+  let pesan='Data Anda telah disimpan. Hasil penempatan wali kelas akan diumumkan oleh Kepala Sekolah.';
+  if(state.bendahara) pesan='Karena Anda adalah Bendahara Komite, Anda akan dipertimbangkan untuk wali kelas 1 atau 2 saja.';
+  if(state.keberatan&&state.kelasAnak) pesan+=` Kelas ${state.kelasAnak} dikecualikan dari penempatan Anda.`;
+  document.getElementById('pesan-selesai').textContent=pesan;
+  showScreen('screen-selesai');
+  // Otomatis kirim ke Google Sheet
+  await kirimEntryKeSheet(entry);
+}
+
+async function kirimEntryKeSheet(entry){
+  const el = document.getElementById('gs-selesai-status');
+  el.className='alert alert-info';
+  el.innerHTML='<i class="ti ti-loader ti-spin"></i> Mengirim data ke Google Sheet…';
+  el.style.display='block';
+
+  // Simpan ke antrian pending agar bisa di-retry jika gagal
+  const pending = JSON.parse(localStorage.getItem("simara_pending")||"[]");
+  if(!pending.find(p=>p.id===entry.id)) pending.push(entry);
+  localStorage.setItem("simara_pending", JSON.stringify(pending));
+
+  const berhasil = await cobaKirimKeSheet(entry);
+  if(berhasil){
+    // Hapus dari antrian pending
+    const antrian = JSON.parse(localStorage.getItem("simara_pending")||"[]");
+    localStorage.setItem("simara_pending", JSON.stringify(antrian.filter(p=>p.id!==entry.id)));
+    el.className='alert alert-success';
+    el.innerHTML='<i class="ti ti-circle-check"></i> Data asesmen & rekap penempatan berhasil disimpan ke Google Sheet!';
+  } else {
+    el.className='alert alert-warning';
+    el.innerHTML='<i class="ti ti-alert-triangle"></i> Data tersimpan lokal. Akan dikirim ulang saat koneksi tersedia.';
+    // Coba kirim ulang 3x dengan jeda
+    for(let i=1;i<=3;i++){
+      await delay(3000*i);
+      const retry = await cobaKirimKeSheet(entry);
+      if(retry){
+        const antrian = JSON.parse(localStorage.getItem("simara_pending")||"[]");
+        localStorage.setItem("simara_pending", JSON.stringify(antrian.filter(p=>p.id!==entry.id)));
+        el.className='alert alert-success';
+        el.innerHTML='<i class="ti ti-circle-check"></i> Data berhasil dikirim ke Google Sheet (percobaan ke-'+(i+1)+')!';
+        return;
+      }
+    }
+  }
+}
+
+async function cobaKirimKeSheet(entry){
+  try{
+    // PERBAIKAN: gunakan text/plain agar tidak memicu preflight CORS di GAS
+    const r1 = await fetch(GAS_URL_HARDCODED, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'simpanAsesmen', data:entry})
+    });
+    const j1 = await r1.json();
+
+    // Hitung & kirim rekap penempatan terbaru
+    const raw = JSON.parse(localStorage.getItem("data_wali_kelas_sdn1")||"[]");
+    if(raw.length > 0){
+      const rekapData = tentukanKelas(JSON.parse(JSON.stringify(raw)));
+      await fetch(GAS_URL_HARDCODED, {
+        method:'POST',
+        headers:{'Content-Type':'text/plain'},
+        body:JSON.stringify({action:'simpanRekap', data:rekapData})
+      });
+    }
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
+// ========================================
+// KEPALA SEKOLAH
+// ========================================
+function loginKepsek(){
+  const cfg=getCONFIG();
+  const p=document.getElementById('pass-kepsek').value;
+  const err=document.getElementById('kepsek-error');
+  if(p===cfg.KEPSEK_PASS){err.style.display='none';document.getElementById('pass-kepsek').value='';tampilkanDashboard();showScreen('screen-dashboard');}
+  else{err.style.display='block';}
+}
+function logoutKepsek(){showScreen('screen-role');}
+
+function tentukanKelas(data){
+  data.sort((a,b)=>a.skor-b.skor);
+  const bendahara=data.filter(d=>d.bendahara);
+  const bukan=data.filter(d=>!d.bendahara);
+  const kelasBendahara=[1,2];
+  const kelasBukan=[1,2,3,4,5,6];
+  function tempatkan(daftar,kelasPool){
+    const hasil=[];const kelasDigunakan=new Set();
+    daftar.forEach(g=>{
+      const excluded=new Set(g.keberatan&&g.kelasAnak?[g.kelasAnak]:[]);
+      let kelas=null;
+      for(const k of kelasPool){if(!kelasDigunakan.has(k)&&!excluded.has(k)){kelas=k;break;}}
+      if(kelas===null){for(const k of kelasPool){if(!kelasDigunakan.has(k)){kelas=k;break;}}}
+      if(kelas===null)kelas=kelasPool[kelasPool.length-1];
+      g.kelas_assigned=kelas;kelasDigunakan.add(kelas);hasil.push(g);
+    });
+    return hasil;
+  }
+  const hasilBendahara=tempatkan(bendahara,kelasBendahara);
+  const kelasTerpakai=new Set(hasilBendahara.map(g=>g.kelas_assigned));
+  const poolBukan=bendahara.length>0?kelasBukan.filter(k=>!kelasTerpakai.has(k)):kelasBukan;
+  const hasilBukan=tempatkan(bukan,poolBukan.length>0?poolBukan:kelasBukan);
+  return [...hasilBendahara,...hasilBukan].sort((a,b)=>a.kelas_assigned-b.kelas_assigned);
+}
+
+function tampilkanDashboard(){
+  const raw=JSON.parse(localStorage.getItem("data_wali_kelas_sdn1")||"[]");
+  const noData=document.getElementById('no-data');
+  if(raw.length===0){noData.style.display='block';document.getElementById('stats-row').innerHTML='';document.getElementById('rekap-penempatan').innerHTML='';document.getElementById('tabel-detail').innerHTML='';return;}
+  noData.style.display='none';
+  const data=tentukanKelas(JSON.parse(JSON.stringify(raw)));
+  const avgSkor=Math.round(data.reduce((a,b)=>a+b.skor,0)/data.length);
+  const bendaharaCount=data.filter(d=>d.bendahara).length;
+  const anakCount=data.filter(d=>d.keberatan&&d.kelasAnak).length;
+  document.getElementById('stats-row').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${data.length}</div><div class="stat-label">Total Guru</div></div>
+    <div class="stat-card"><div class="stat-num">${avgSkor}</div><div class="stat-label">Rata-rata Skor</div></div>
+    <div class="stat-card"><div class="stat-num">${bendaharaCount}</div><div class="stat-label">Bendahara</div></div>
+    <div class="stat-card"><div class="stat-num">${anakCount}</div><div class="stat-label">Ada Anak di Sekolah</div></div>`;
+  const kelasClass={1:'kelas-1',2:'kelas-2',3:'kelas-3',4:'kelas-4',5:'kelas-5',6:'kelas-6'};
+  const grouped={};
+  data.forEach(g=>{if(!grouped[g.kelas_assigned])grouped[g.kelas_assigned]=[];grouped[g.kelas_assigned].push(g);});
+  let html='<div style="display:grid;gap:8px">';
+  [1,2,3,4,5,6].forEach(k=>{
+    const list=grouped[k]||[];
+    html+=`<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#fafafa">
+      <span class="kelas-badge ${kelasClass[k]}" style="margin-top:2px;white-space:nowrap">Kelas ${k}</span>
+      <div style="flex:1">${list.length>0
+        ?list.map(g=>`<div style="font-size:14px;color:#1e293b;margin-bottom:2px">${g.nama}<span style="font-size:12px;color:#64748b;margin-left:4px">Skor: ${g.skor}${g.bendahara?' · <span style="color:#92400e">Bendahara</span>':''}${g.keberatan&&g.kelasAnak?' · <span style="color:#1d4ed8">Anak Kelas '+g.kelasAnak+'</span>':''}</span></div>`).join('')
+        :'<span style="font-size:13px;color:#94a3b8">Belum ada guru</span>'}</div></div>`;
+  });
+  html+='</div>';
+  document.getElementById('rekap-penempatan').innerHTML=html;
+  document.getElementById('tabel-detail').innerHTML=`<thead><tr><th>No</th><th>Nama Guru</th><th>NIP</th><th>Skor</th><th>Bendahara</th><th>Anak di Kelas</th><th>Kelas</th><th>Waktu</th></tr></thead>
+    <tbody>${data.map((g,i)=>`<tr><td>${i+1}</td><td>${g.nama}</td><td>${g.nip||'-'}</td>
+      <td style="font-weight:600">${g.skor}</td>
+      <td>${g.bendahara?'<span class="badge badge-amber">Ya</span>':'Tidak'}</td>
+      <td>${g.keberatan&&g.kelasAnak?`<span class="kelas-badge ${kelasClass[g.kelasAnak]}">Kelas ${g.kelasAnak}</span>`:'–'}</td>
+      <td><span class="kelas-badge ${kelasClass[g.kelas_assigned]}">Kelas ${g.kelas_assigned}</span></td>
+      <td style="color:#64748b;font-size:12px">${g.timestamp}</td></tr>`).join('')}</tbody>`;
+}
+
+function switchTab(tabId,btnId){
+  ['tab-rekap','tab-detail'].forEach(id=>{document.getElementById(id).style.display=id===tabId?'block':'none';});
+  document.querySelectorAll('#screen-dashboard .tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(btnId).classList.add('active');
+}
+
+async function kirimKeGoogleSheet(){
+  const raw=JSON.parse(localStorage.getItem("data_wali_kelas_sdn1")||"[]");
+  if(raw.length===0){alert("Tidak ada data untuk dikirim.");return;}
+  const el=document.getElementById('gs-status');
+  el.style.display='block';el.className='alert alert-info';
+  el.innerHTML='<i class="ti ti-loader ti-spin"></i> Mengirim rekap ke Google Sheet…';
+  try{
+    const data=tentukanKelas(JSON.parse(JSON.stringify(raw)));
+    const r = await fetch(GAS_URL_HARDCODED,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'simpanRekap',data:data})});
+    const j = await r.json();
+    el.className='alert alert-success';
+    el.innerHTML='<i class="ti ti-circle-check"></i> Rekap penempatan berhasil disimpan ke Google Sheet!';
+  }catch(e){
+    el.className='alert alert-warning';
+    el.innerHTML='<i class="ti ti-alert-triangle"></i> Koneksi ke Google Sheet gagal. Periksa internet.';
+  }
+  setTimeout(()=>{el.style.display='none';},7000);
+}
+
+function hapusSemuaData(){
+  if(!confirm("Yakin ingin menghapus semua data asesmen? Tindakan ini tidak dapat dibatalkan."))return;
+  localStorage.removeItem("data_wali_kelas_sdn1");
+  dataGuru=[];
+  tampilkanDashboard();
+}
+
+async function muatUlangDashboard(){
+  const el=document.getElementById('gs-status');
+  el.style.display='block';el.className='alert alert-info';
+  el.innerHTML='<i class="ti ti-loader ti-spin"></i> Mengambil data asesmen dari Google Sheet…';
+  try{
+    const resp=await fetch(GAS_URL_HARDCODED+'?action=getData');
+    const json=await resp.json();
+    if(json.asesmen && json.asesmen.length>0){
+      const lokal=JSON.parse(localStorage.getItem("data_wali_kelas_sdn1")||"[]");
+      const lokalIds=new Set(lokal.map(d=>d.id));
+      const baru=json.asesmen.filter(d=>!lokalIds.has(d.id));
+      const gabung=[...lokal,...baru];
+      localStorage.setItem("data_wali_kelas_sdn1",JSON.stringify(gabung));
+      el.className='alert alert-success';
+      el.innerHTML=`<i class="ti ti-circle-check"></i> Data asesmen berhasil dimuat! Total: ${gabung.length} guru.`;
+    } else {
+      el.className='alert alert-info';
+      el.innerHTML='<i class="ti ti-info-circle"></i> Tidak ada data baru dari Google Sheet.';
+    }
+    tampilkanDashboard();
+  }catch(e){
+    el.className='alert alert-warning';
+    el.innerHTML='<i class="ti ti-alert-triangle"></i> Gagal mengambil data dari Google Sheet.';
+  }
+  setTimeout(()=>{el.style.display='none';},6000);
+}
+
+// ========================================
+// ADMIN
+// ========================================
+function loginAdmin(){
+  const cfg=getCONFIG();
+  const p=document.getElementById('pass-admin').value;
+  const err=document.getElementById('admin-error');
+  if(p===cfg.ADMIN_PASS){
+    err.style.display='none';
+    document.getElementById('pass-admin').value='';
+    initAdminPanel();
+    showScreen('screen-admin');
+  } else {err.style.display='block';}
+}
+
+function logoutAdmin(){showScreen('screen-role');}
+
+function switchAdminTab(tabId,btnId){
+  ['atab-guru','atab-kelas','atab-soal','atab-setting'].forEach(id=>{document.getElementById(id).style.display=id===tabId?'block':'none';});
+  document.querySelectorAll('#screen-admin .tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(btnId).classList.add('active');
+}
+
+function initAdminPanel(){
+  renderAdminGuru();
+  renderAdminKelas();
+  renderAdminSoal();
+  loadSettingUI();
+}
+
+// ---- GURU ADMIN ----
+function renderAdminGuru(){
+  const list=getGURU();
+  const cont=document.getElementById('admin-guru-list');
+  if(!list||list.length===0){cont.innerHTML='<div class="alert alert-warning">Belum ada data guru.</div>';return;}
+  cont.innerHTML=list.map((g,i)=>`
+    <div class="list-item">
+      <div class="list-item-info">
+        <div class="list-item-name">${g.nama}</div>
+        <div class="list-item-sub">${g.jabatan||''} ${g.nip?'· NIP: '+g.nip:''}</div>
+      </div>
+      <div class="list-item-actions">
+        <button class="btn btn-sm" onclick="openModalGuru(${i})" title="Edit"><i class="ti ti-pencil"></i></button>
+        <button class="btn btn-sm" onclick="hapusGuru(${i})" style="color:#991b1b;border-color:#fecaca" title="Hapus"><i class="ti ti-trash"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+function openModalGuru(idx){
+  editGuruIdx = (idx!==undefined)?idx:null;
+  const title = editGuruIdx!==null?'Edit Guru':'Tambah Guru';
+  document.getElementById('modal-guru-title').textContent=title;
+  if(editGuruIdx!==null){
+    const g=getGURU()[editGuruIdx];
+    document.getElementById('mg-nama').value=g.nama;
+    document.getElementById('mg-nip').value=g.nip||'';
+    document.getElementById('mg-jabatan').value=g.jabatan||'';
+  } else {
+    document.getElementById('mg-nama').value='';
+    document.getElementById('mg-nip').value='';
+    document.getElementById('mg-jabatan').value='';
+  }
+  document.getElementById('modal-guru').classList.add('active');
+}
+
+function simpanGuru(){
+  const nama=document.getElementById('mg-nama').value.trim();
+  if(!nama){alert("Nama wajib diisi.");return;}
+  const list=getGURU();
+  const obj={id:Date.now(),nama,nip:document.getElementById('mg-nip').value.trim(),jabatan:document.getElementById('mg-jabatan').value.trim()};
+  if(editGuruIdx!==null){list[editGuruIdx]={...list[editGuruIdx],...obj};}
+  else{list.push(obj);}
+  saveGURU(list);
+  renderAdminGuru();
+  closeModal('modal-guru');
+  showSyncStatus('Data guru berhasil disimpan!','success');
+}
+
+function hapusGuru(idx){
+  if(!confirm("Hapus guru ini?"))return;
+  const list=getGURU();
+  list.splice(idx,1);
+  saveGURU(list);
+  renderAdminGuru();
+}
+
+async function syncGuruKeSheet(){
+  showSyncStatus('Mengirim data guru ke Google Sheet…','info');
+  try{
+    const r = await fetch(GAS_URL_HARDCODED,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'simpanGurus',data:getGURU()})});
+    await r.json();
+    showSyncStatus('Data guru berhasil dikirim ke Google Sheet!','success');
+  }catch(e){showSyncStatus('Gagal terhubung ke Google Sheet.','warning');}
+}
+
+// ---- KELAS ADMIN ----
+function renderAdminKelas(){
+  const list=getKELAS();
+  const cont=document.getElementById('admin-kelas-list');
+  if(!list||list.length===0){cont.innerHTML='<div class="alert alert-warning">Belum ada data kelas.</div>';return;}
+  cont.innerHTML=list.map((k,i)=>`
+    <div class="list-item">
+      <div class="list-item-info">
+        <div class="list-item-name">${k.nama}</div>
+        <div class="list-item-sub">Kapasitas: ${k.kapasitas||'-'} siswa ${k.keterangan?'· '+k.keterangan:''}</div>
+      </div>
+      <div class="list-item-actions">
+        <button class="btn btn-sm" onclick="openModalKelas(${i})" title="Edit"><i class="ti ti-pencil"></i></button>
+        <button class="btn btn-sm" onclick="hapusKelas(${i})" style="color:#991b1b;border-color:#fecaca" title="Hapus"><i class="ti ti-trash"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+function openModalKelas(idx){
+  editKelasIdx = (idx!==undefined)?idx:null;
+  document.getElementById('modal-kelas-title').textContent=editKelasIdx!==null?'Edit Kelas':'Tambah Kelas';
+  if(editKelasIdx!==null){
+    const k=getKELAS()[editKelasIdx];
+    document.getElementById('mk-nama').value=k.nama;
+    document.getElementById('mk-kapasitas').value=k.kapasitas||'';
+    document.getElementById('mk-ket').value=k.keterangan||'';
+  } else {
+    document.getElementById('mk-nama').value='';
+    document.getElementById('mk-kapasitas').value='';
+    document.getElementById('mk-ket').value='';
+  }
+  document.getElementById('modal-kelas').classList.add('active');
+}
+
+function simpanKelas(){
+  const nama=document.getElementById('mk-nama').value.trim();
+  if(!nama){alert("Nama kelas wajib diisi.");return;}
+  const list=getKELAS();
+  const obj={id:Date.now(),nama,kapasitas:document.getElementById('mk-kapasitas').value.trim(),keterangan:document.getElementById('mk-ket').value.trim()};
+  if(editKelasIdx!==null){list[editKelasIdx]={...list[editKelasIdx],...obj};}
+  else{list.push(obj);}
+  saveKELAS(list);
+  renderAdminKelas();
+  closeModal('modal-kelas');
+  showSyncStatus('Data kelas berhasil disimpan!','success');
+}
+
+function hapusKelas(idx){
+  if(!confirm("Hapus kelas ini?"))return;
+  const list=getKELAS();list.splice(idx,1);saveKELAS(list);renderAdminKelas();
+}
+
+async function syncKelasKeSheet(){
+  showSyncStatus('Mengirim data kelas ke Google Sheet…','info');
+  try{
+    const r = await fetch(GAS_URL_HARDCODED,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'simpanKelas',data:getKELAS()})});
+    await r.json();
+    showSyncStatus('Data kelas berhasil dikirim ke Google Sheet!','success');
+  }catch(e){showSyncStatus('Gagal terhubung ke Google Sheet.','warning');}
+}
+
+// ---- SOAL ADMIN ----
+function renderAdminSoal(){
+  const list=getSOAL();
+  const cont=document.getElementById('admin-soal-list');
+  cont.innerHTML=list.map((s,si)=>`
+    <div class="soal-admin-card">
+      <div class="soal-num-label">
+        <span>Soal ${si+1} — ${s.mapel}</span>
+        <div style="display:flex;gap:6px">
+          <select onchange="gantiMapel(${si},this.value)" style="font-size:12px;padding:3px 6px;margin-bottom:0;width:auto">
+            <option value="Matematika" ${s.mapel==='Matematika'?'selected':''}>Matematika</option>
+            <option value="Bahasa Indonesia" ${s.mapel==='Bahasa Indonesia'?'selected':''}>Bahasa Indonesia</option>
+            <option value="IPA" ${s.mapel==='IPA'?'selected':''}>IPA</option>
+            <option value="IPS" ${s.mapel==='IPS'?'selected':''}>IPS</option>
+            <option value="PKn" ${s.mapel==='PKn'?'selected':''}>PKn</option>
+          </select>
+          <button class="btn btn-sm" onclick="hapusSoal(${si})" style="color:#991b1b;border-color:#fecaca;padding:4px 8px"><i class="ti ti-trash"></i></button>
+        </div>
+      </div>
+      <textarea id="soal-teks-${si}" rows="2" style="font-size:13px;margin-bottom:8px" oninput="updateSoalTeks(${si})">${s.teks}</textarea>
+      ${s.opsi.map((o,oi)=>`
+        <div class="opsi-input-row">
+          <span style="font-size:13px;font-weight:600;color:#94a3b8;width:20px;flex-shrink:0">${String.fromCharCode(65+oi)}.</span>
+          <input type="text" id="opsi-${si}-${oi}" value="${o.replace(/"/g,'&quot;')}" oninput="updateOpsi(${si},${oi})" style="margin-bottom:0">
+          <button class="kunci-btn ${s.jawaban===oi?'correct':''}" onclick="setJawaban(${si},${oi})" title="Tandai sebagai jawaban benar">
+            ${s.jawaban===oi?'✓':'○'}
+          </button>
+        </div>`).join('')}
+      <button class="btn btn-sm" onclick="tambahOpsi(${si})" style="margin-top:6px;font-size:12px"><i class="ti ti-plus"></i> Tambah Opsi</button>
+    </div>`).join('');
+}
+
+function gantiMapel(si,val){const list=getSOAL();list[si].mapel=val;saveSOAL(list);renderAdminSoal();}
+function updateSoalTeks(si){const list=getSOAL();list[si].teks=document.getElementById('soal-teks-'+si).value;saveSOAL(list);}
+function updateOpsi(si,oi){const list=getSOAL();list[si].opsi[oi]=document.getElementById(`opsi-${si}-${oi}`).value;saveSOAL(list);}
+function setJawaban(si,oi){const list=getSOAL();list[si].jawaban=oi;saveSOAL(list);renderAdminSoal();}
+function hapusSoal(si){if(!confirm("Hapus soal ini?"))return;const list=getSOAL();list.splice(si,1);saveSOAL(list);renderAdminSoal();}
+function tambahOpsi(si){const list=getSOAL();list[si].opsi.push("Opsi baru");saveSOAL(list);renderAdminSoal();}
+function tambahSoalBaru(){
+  const list=getSOAL();
+  list.push({mapel:"Matematika",teks:"Tulis pertanyaan di sini…",opsi:["Opsi A","Opsi B","Opsi C","Opsi D"],jawaban:0});
+  saveSOAL(list);renderAdminSoal();
+  // Scroll ke bawah
+  setTimeout(()=>{const cont=document.getElementById('admin-soal-list');cont.lastElementChild&&cont.lastElementChild.scrollIntoView({behavior:'smooth'});},100);
+}
+
+async function syncSoalKeSheet(){
+  showSyncStatus('Mengirim soal ke Google Sheet…','info');
+  try{
+    const r = await fetch(GAS_URL_HARDCODED,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'simpanSoal',data:getSOAL()})});
+    await r.json();
+    showSyncStatus('Soal berhasil dikirim ke Google Sheet!','success');
+  }catch(e){showSyncStatus('Gagal terhubung ke Google Sheet.','warning');}
+}
+
+// ---- SETTING ----
+function loadSettingUI(){
+  const cfg=getCONFIG();
+  document.getElementById('toggle-acak-soal').checked=!!cfg.acakSoal;
+  document.getElementById('toggle-acak-opsi').checked=!!cfg.acakOpsi;
+  document.getElementById('setting-gs-url').value=cfg.GS_URL||'';
+  document.getElementById('setting-kepsek-pass').value=cfg.KEPSEK_PASS||'';
+  document.getElementById('setting-admin-pass').value=cfg.ADMIN_PASS||'';
+}
+
+function saveSetting(){
+  const cfg=getCONFIG();
+  cfg.acakSoal=document.getElementById('toggle-acak-soal').checked;
+  cfg.acakOpsi=document.getElementById('toggle-acak-opsi').checked;
+  saveCONFIG(cfg);
+}
+
+function saveSettingConfig(){
+  const cfg=getCONFIG();
+  // URL GAS sudah tertanam di kode, tidak perlu disimpan
+  cfg.KEPSEK_PASS=document.getElementById('setting-kepsek-pass').value.trim()||cfg.KEPSEK_PASS;
+  cfg.ADMIN_PASS=document.getElementById('setting-admin-pass').value.trim()||cfg.ADMIN_PASS;
+  cfg.acakSoal=document.getElementById('toggle-acak-soal').checked;
+  cfg.acakOpsi=document.getElementById('toggle-acak-opsi').checked;
+  saveCONFIG(cfg);
+  showSyncStatus('Konfigurasi berhasil disimpan!','success');
+}
+
+async function testGoogleSheet(){
+  const el=document.getElementById('gs-test-status');
+  el.style.display='block';el.className='alert alert-info';
+  el.innerHTML='<i class="ti ti-loader ti-spin"></i> Menguji koneksi Google Sheet…';
+  try{
+    const r = await fetch(GAS_URL_HARDCODED+'?action=ping');
+    const j = await r.json();
+    el.className='alert alert-success';
+    el.innerHTML='<i class="ti ti-circle-check"></i> Koneksi ke Google Sheet berhasil!';
+  }catch(e){
+    el.className='alert alert-danger';
+    el.innerHTML='<i class="ti ti-alert-circle"></i> Gagal menjangkau Google Sheet. Periksa koneksi internet.';
+  }
+}
+
+async function tarikDataDariSheet(){
+  const el=document.getElementById('sync-status');
+  el.style.display='block';el.className='alert alert-info';
+  el.innerHTML='<i class="ti ti-loader ti-spin"></i> Mengambil data dari Google Sheet…';
+  try{
+    const resp=await fetch(GAS_URL_HARDCODED+'?action=getData');
+    const json=await resp.json();
+    if(json.guru && json.guru.length>0) saveGURU(json.guru);
+    if(json.kelas && json.kelas.length>0) saveKELAS(json.kelas);
+    if(json.soal && json.soal.length>0) saveSOAL(json.soal);
+    if(json.asesmen && json.asesmen.length>0){
+      const lokal=JSON.parse(localStorage.getItem("data_wali_kelas_sdn1")||"[]");
+      const lokalIds=new Set(lokal.map(d=>d.id));
+      const baru=json.asesmen.filter(d=>!lokalIds.has(d.id));
+      localStorage.setItem("data_wali_kelas_sdn1",JSON.stringify([...lokal,...baru]));
+    }
+    renderAdminGuru();renderAdminKelas();renderAdminSoal();
+    el.className='alert alert-success';
+    el.innerHTML='<i class="ti ti-circle-check"></i> Data berhasil diambil dari Google Sheet!';
+  }catch(e){
+    el.className='alert alert-warning';
+    el.innerHTML='<i class="ti ti-alert-triangle"></i> Gagal mengambil data. Pastikan koneksi internet aktif.';
+  }
+}
+
+// ---- HELPERS ----
+function showSyncStatus(msg,type){
+  const el=document.getElementById('admin-sync-status');
+  const classes={success:'alert-success',warning:'alert-warning',info:'alert-info',danger:'alert-danger'};
+  const icons={success:'ti-circle-check',warning:'ti-alert-triangle',info:'ti-info-circle',danger:'ti-alert-circle'};
+  el.style.display='block';
+  el.className='alert '+classes[type];
+  el.innerHTML=`<i class="ti ${icons[type]}"></i> ${msg}`;
+  setTimeout(()=>{el.style.display='none';},5000);
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.remove('active');
+}
+
+function resetApp(){
+  state={nama:"",nip:"",namaTerpilih:"",bendahara:false,punyaAnak:false,keberatan:false,kelasAnak:null,soalIdx:0,jawaban:[],skorAkhir:0,soalAktif:[]};
+  document.getElementById('nip-guru').value='';
+  document.querySelectorAll('input[name=bend],input[name=anak],input[name=keberatan]').forEach(r=>r.checked=false);
+  document.querySelectorAll('.opsi-label').forEach(l=>l.classList.remove('selected'));
+  renderGuruSelect();
+  showScreen('screen-role');
+}
+
+// ========================================
+// INIT
+// ========================================
+document.addEventListener('DOMContentLoaded',()=>{
+  renderGuruSelect();
+  initSplash();
+});
+</script>
+</body>
+</html>
