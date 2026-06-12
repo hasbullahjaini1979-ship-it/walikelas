@@ -246,15 +246,15 @@ input:checked+.toggle-slider:before{transform:translateX(20px)}
 <div id="screen-bendahara" class="screen">
   <div class="card">
     <div style="margin-bottom:14px"><span class="badge badge-amber">Tugas Tambahan</span></div>
-    <p class="soal-text">Apakah Anda saat ini menjabat sebagai <strong>Bendahara Komite</strong> di SD Negeri-1 Raja?</p>
+    <p class="soal-text">Apakah Anda saat ini menjabat sebagai <strong>Bendahara BOS</strong> di SD Negeri-1 Raja?</p>
     <div class="alert alert-warning" style="margin-bottom:14px">
       <i class="ti ti-alert-triangle"></i> Jika ya, Anda hanya akan dipertimbangkan untuk wali kelas 1 atau 2, sesuai skor asesmen.
     </div>
     <label class="opsi-label" id="label-bend-ya" onclick="pilihanBendahara('ya')">
-      <input type="radio" name="bend" value="ya" id="bend-ya"> <span>Ya, saya adalah Bendahara Komite</span>
+      <input type="radio" name="bend" value="ya" id="bend-ya"> <span>Ya, saya adalah Bendahara BOS</span>
     </label>
     <label class="opsi-label" id="label-bend-tidak" onclick="pilihanBendahara('tidak')">
-      <input type="radio" name="bend" value="tidak" id="bend-tidak"> <span>Tidak, saya bukan Bendahara Komite</span>
+      <input type="radio" name="bend" value="tidak" id="bend-tidak"> <span>Tidak, saya bukan Bendahara BOS</span>
     </label>
     <div class="row" style="margin-top:16px">
       <button class="btn" onclick="showScreen('screen-login-guru')"><i class="ti ti-arrow-left"></i> Kembali</button>
@@ -274,6 +274,15 @@ input:checked+.toggle-slider:before{transform:translateX(20px)}
     <label class="opsi-label" id="label-anak-tidak" onclick="pilihanAnak('tidak')">
       <input type="radio" name="anak" value="tidak" id="anak-tidak"> <span>Tidak, saya tidak memiliki anak di sekolah ini</span>
     </label>
+    <!-- Pilihan jumlah anak, muncul saat memilih Ya -->
+    <div id="jumlah-anak-wrap" style="display:none;margin-top:12px;padding:14px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0">
+      <label class="field-label">Berapa jumlah anak Anda yang bersekolah di sini?</label>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" id="btn-anak-1" onclick="pilihJumlahAnak(1)" style="flex:1;justify-content:center;font-weight:600">1 Anak</button>
+        <button class="btn" id="btn-anak-2" onclick="pilihJumlahAnak(2)" style="flex:1;justify-content:center;font-weight:600">2 Anak</button>
+        <button class="btn" id="btn-anak-lebih" onclick="pilihJumlahAnak(3)" style="flex:1;justify-content:center;font-weight:600">3+ Anak</button>
+      </div>
+    </div>
     <div class="row" style="margin-top:16px">
       <button class="btn" onclick="showScreen('screen-bendahara')"><i class="ti ti-arrow-left"></i> Kembali</button>
       <button class="btn btn-primary" onclick="lanjutDariAnak()">Lanjut <i class="ti ti-arrow-right"></i></button>
@@ -306,11 +315,14 @@ input:checked+.toggle-slider:before{transform:translateX(20px)}
 <div id="screen-kelas-anak" class="screen">
   <div class="card">
     <div style="margin-bottom:14px"><span class="badge badge-amber">Tugas Tambahan</span></div>
-    <p class="soal-text">Anak Anda saat ini duduk di kelas berapa?</p>
+    <p class="soal-text" id="judul-kelas-anak">Anak Anda saat ini duduk di kelas berapa?</p>
     <div class="alert alert-warning" style="margin-bottom:14px">
-      <i class="ti ti-alert-triangle"></i> Anda tidak akan ditempatkan sebagai wali kelas di kelas tersebut.
+      <i class="ti ti-alert-triangle"></i> Anda <strong>tidak akan bisa</strong> ditempatkan sebagai wali kelas di kelas yang ditempati anak Anda.
     </div>
     <div id="opsi-kelas-anak" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"></div>
+    <div id="kelas-anak-hint" style="display:none;margin-top:10px" class="alert alert-info">
+      <i class="ti ti-info-circle"></i> Pilih semua kelas yang ditempati anak-anak Anda.
+    </div>
     <div class="row" style="margin-top:16px">
       <button class="btn" onclick="showScreen('screen-anak-keberatan')"><i class="ti ti-arrow-left"></i> Kembali</button>
       <button class="btn btn-primary" onclick="lanjutDariKelasAnak()">Lanjut ke Soal <i class="ti ti-arrow-right"></i></button>
@@ -445,6 +457,7 @@ input:checked+.toggle-slider:before{transform:translateX(20px)}
       <button class="tab active" id="btn-atab-guru" onclick="switchAdminTab('atab-guru','btn-atab-guru')"><i class="ti ti-users"></i> Guru</button>
       <button class="tab" id="btn-atab-kelas" onclick="switchAdminTab('atab-kelas','btn-atab-kelas')"><i class="ti ti-building-school"></i> Kelas</button>
       <button class="tab" id="btn-atab-soal" onclick="switchAdminTab('atab-soal','btn-atab-soal')"><i class="ti ti-list-check"></i> Soal</button>
+      <button class="tab" id="btn-atab-reset" onclick="switchAdminTab('atab-reset','btn-atab-reset')"><i class="ti ti-refresh-alert"></i> Reset</button>
       <button class="tab" id="btn-atab-setting" onclick="switchAdminTab('atab-setting','btn-atab-setting')"><i class="ti ti-adjustments"></i> Pengaturan</button>
     </div>
 
@@ -489,6 +502,24 @@ input:checked+.toggle-slider:before{transform:translateX(20px)}
         <div id="admin-soal-list"></div>
         <div class="row" style="margin-top:12px">
           <button class="btn btn-sm" onclick="syncSoalKeSheet()"><i class="ti ti-cloud-upload"></i> Simpan Soal ke Google Sheet</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: RESET ASESMEN -->
+    <div id="atab-reset" style="display:none">
+      <div class="admin-section">
+        <h3><i class="ti ti-refresh-alert" style="color:#991b1b"></i> Reset Asesmen Guru</h3>
+        <div class="alert alert-warning" style="margin-bottom:14px">
+          <i class="ti ti-alert-triangle"></i> <strong>Perhatian:</strong> Reset akan menghapus data asesmen guru yang dipilih dari perangkat ini <em>dan</em> dari Google Sheet. Guru tersebut dapat mengikuti asesmen kembali.
+        </div>
+        <div class="row" style="margin-bottom:12px;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-sm" onclick="renderResetList()"><i class="ti ti-refresh"></i> Muat Ulang</button>
+          <button class="btn btn-sm" style="color:#991b1b;border-color:#fecaca" onclick="resetSemuaAsesmen()"><i class="ti ti-trash"></i> Reset Semua Asesmen</button>
+        </div>
+        <div id="reset-asesmen-status" style="display:none;margin-bottom:12px"></div>
+        <div id="reset-asesmen-list">
+          <div class="alert alert-info"><i class="ti ti-info-circle"></i> Belum ada data asesmen. Semua guru bisa ikut asesmen.</div>
         </div>
       </div>
     </div>
@@ -541,11 +572,6 @@ input:checked+.toggle-slider:before{transform:translateX(20px)}
         <button class="btn" onclick="tarikDataDariSheet()"><i class="ti ti-refresh"></i> Tarik Data dari Google Sheet</button>
         <div id="sync-status" style="display:none;margin-top:12px"></div>
       </div>
-      <div class="admin-section">
-        <h3><i class="ti ti-trash" style="color:#991b1b"></i> Reset Data</h3>
-        <p style="font-size:13px;color:#64748b;margin-bottom:12px">Hapus seluruh data asesmen guru yang tersimpan lokal.</p>
-        <button class="btn" style="color:#991b1b;border-color:#fecaca" onclick="hapusSemuaData()"><i class="ti ti-trash"></i> Hapus Data Asesmen</button>
-      </div>
     </div>
 
   </div>
@@ -557,7 +583,7 @@ input:checked+.toggle-slider:before{transform:translateX(20px)}
 // ========================================
 // KONFIGURASI DEFAULT
 // ========================================
-const GAS_URL_HARDCODED = "https://script.google.com/macros/s/AKfycbwwQmqw5nEqT1QRVt7PMoAZ6i2H8b0Z-6dBD4KJPwcJypqAknp6y9T75fYVQwcA-tCLsw/exec";
+const GAS_URL_HARDCODED = "https://script.google.com/macros/s/AKfycbxpmAVrwrIXsaUavlPwoYNDgWldxeIE0Zb1pcoN4AuiFeq5A5WhudE1iNeqJO_TzDk5kA/exec";
 
 let CONFIG = {
   GS_URL: GAS_URL_HARDCODED,
@@ -604,7 +630,7 @@ let KELAS_DEFAULT = [
 // ========================================
 // STATE
 // ========================================
-let state = {nama:"",nip:"",bendahara:false,punyaAnak:false,keberatan:false,kelasAnak:null,soalIdx:0,jawaban:[],skorAkhir:0,soalAktif:[]};
+let state = {nama:"",nip:"",bendahara:false,punyaAnak:false,jumlahAnak:1,keberatan:false,kelasAnak:[],soalIdx:0,jawaban:[],skorAkhir:0,soalAktif:[]};
 let dataGuru = [];
 let editGuruIdx = null;
 let editKelasIdx = null;
@@ -716,6 +742,14 @@ function pilihGuru(idx, nama){
 
 function mulaiAsesmenGuru(){
   if(!state.namaTerpilih){alert("Pilih nama Anda terlebih dahulu.");return;}
+  // Cek apakah guru ini sudah pernah mengikuti asesmen
+  const dataAsesmen = JSON.parse(localStorage.getItem("data_wali_kelas_sdn1")||"[]");
+  const sudahIkut = dataAsesmen.find(d => d.nama.trim().toLowerCase() === state.namaTerpilih.trim().toLowerCase());
+  if(sudahIkut){
+    const tgl = sudahIkut.timestamp || 'waktu tidak diketahui';
+    alert(`⚠️ ${state.namaTerpilih} sudah pernah mengikuti asesmen (${tgl}) dengan skor ${sudahIkut.skor}.\n\nUntuk mengikuti ulang, minta Admin mereset data asesmen Anda.`);
+    return;
+  }
   state.nama = state.namaTerpilih;
   state.nip = document.getElementById('nip-guru').value.trim();
   showScreen('screen-bendahara');
@@ -743,13 +777,30 @@ function pilihanAnak(v){
   document.getElementById('label-anak-tidak').classList.toggle('selected',v==='tidak');
   document.getElementById('anak-ya').checked=v==='ya';
   document.getElementById('anak-tidak').checked=v==='tidak';
+  document.getElementById('jumlah-anak-wrap').style.display = v==='ya' ? 'block' : 'none';
+  if(v==='tidak') state.jumlahAnak=0;
+}
+
+function pilihJumlahAnak(n){
+  state.jumlahAnak = n;
+  ['btn-anak-1','btn-anak-2','btn-anak-lebih'].forEach(id=>{
+    document.getElementById(id).classList.remove('btn-primary');
+    document.getElementById(id).style.background='';
+    document.getElementById(id).style.borderColor='';
+  });
+  const map = {1:'btn-anak-1',2:'btn-anak-2',3:'btn-anak-lebih'};
+  const btn = document.getElementById(map[n>2?3:n]);
+  if(btn){btn.classList.add('btn-primary');}
 }
 
 function lanjutDariAnak(){
   const v=document.querySelector('input[name=anak]:checked');
   if(!v){alert("Harap pilih salah satu jawaban.");return;}
-  if(v.value==='tidak'){state.punyaAnak=false;state.keberatan=false;state.kelasAnak=null;mulaiSoalSekarang();}
-  else{state.punyaAnak=true;showScreen('screen-anak-keberatan');}
+  if(v.value==='tidak'){state.punyaAnak=false;state.keberatan=false;state.kelasAnak=[];state.jumlahAnak=0;mulaiSoalSekarang();}
+  else{
+    if(!state.jumlahAnak||state.jumlahAnak<1){alert("Harap pilih jumlah anak Anda.");return;}
+    state.punyaAnak=true;showScreen('screen-anak-keberatan');
+  }
 }
 
 function pilihanKeberatan(v){
@@ -762,9 +813,20 @@ function pilihanKeberatan(v){
 function lanjutDariKeberatan(){
   const v=document.querySelector('input[name=keberatan]:checked');
   if(!v){alert("Harap pilih salah satu jawaban.");return;}
-  if(v.value==='tidak_masalah'){state.keberatan=false;state.kelasAnak=null;mulaiSoalSekarang();}
-  else{
+  if(v.value==='tidak_masalah'){
+    state.keberatan=false;state.kelasAnak=[];mulaiSoalSekarang();
+  } else {
     state.keberatan=true;
+    state.kelasAnak=[];
+    const jumlah = state.jumlahAnak;
+    const isMulti = jumlah > 1;
+    // Update judul
+    document.getElementById('judul-kelas-anak').textContent = isMulti
+      ? `Anak-anak Anda saat ini duduk di kelas berapa? (Pilih ${jumlah} kelas)`
+      : 'Anak Anda saat ini duduk di kelas berapa?';
+    // Tampilkan hint multi jika lebih dari 1
+    const hint = document.getElementById('kelas-anak-hint');
+    hint.style.display = isMulti ? 'block' : 'none';
     const cont=document.getElementById('opsi-kelas-anak');
     cont.innerHTML='';
     const kelasClass={1:'kelas-1',2:'kelas-2',3:'kelas-3',4:'kelas-4',5:'kelas-5',6:'kelas-6'};
@@ -775,8 +837,26 @@ function lanjutDariKeberatan(){
       btn.style.cssText='justify-content:center;padding:14px 8px;font-size:15px;font-weight:600;width:100%';
       btn.innerHTML=`<span class="kelas-badge ${kelasClass[k]}">Kelas ${k}</span>`;
       btn.onclick=()=>{
-        document.querySelectorAll('#opsi-kelas-anak .btn').forEach(b=>{b.style.background='';b.style.borderColor='';});
-        btn.style.background='#dbeafe';btn.style.borderColor='#185fa5';state.kelasAnak=k;
+        if(isMulti){
+          // Toggle multi-select
+          const idx = state.kelasAnak.indexOf(k);
+          if(idx>=0){
+            state.kelasAnak.splice(idx,1);
+            btn.style.background='';btn.style.borderColor='';btn.style.outline='';
+          } else {
+            if(state.kelasAnak.length < jumlah){
+              state.kelasAnak.push(k);
+              btn.style.background='#dbeafe';btn.style.borderColor='#185fa5';btn.style.outline='2px solid #185fa5';
+            } else {
+              alert(`Anda sudah memilih ${jumlah} kelas. Batalkan pilihan sebelumnya jika ingin mengubah.`);
+            }
+          }
+        } else {
+          // Single select
+          document.querySelectorAll('#opsi-kelas-anak .btn').forEach(b=>{b.style.background='';b.style.borderColor='';b.style.outline='';});
+          btn.style.background='#dbeafe';btn.style.borderColor='#185fa5';
+          state.kelasAnak=[k];
+        }
       };
       cont.appendChild(btn);
     });
@@ -784,7 +864,14 @@ function lanjutDariKeberatan(){
   }
 }
 
-function lanjutDariKelasAnak(){if(!state.kelasAnak){alert("Pilih kelas anak Anda terlebih dahulu.");return;}mulaiSoalSekarang();}
+function lanjutDariKelasAnak(){
+  if(!state.kelasAnak||state.kelasAnak.length===0){alert("Pilih kelas anak Anda terlebih dahulu.");return;}
+  const jumlah = state.jumlahAnak;
+  if(jumlah > 1 && state.kelasAnak.length < jumlah){
+    if(!confirm(`Anda baru memilih ${state.kelasAnak.length} dari ${jumlah} kelas. Lanjutkan?`))return;
+  }
+  mulaiSoalSekarang();
+}
 
 function mulaiSoalSekarang(){
   const cfg = getCONFIG();
@@ -844,7 +931,8 @@ async function hitungSkor(){
   state.skorAkhir=Math.round((benar/soal.length)*100);
   const entry={
     nama:state.nama,nip:state.nip,bendahara:state.bendahara,
-    punyaAnak:state.punyaAnak,keberatan:state.keberatan,kelasAnak:state.kelasAnak,
+    punyaAnak:state.punyaAnak,jumlahAnak:state.jumlahAnak,
+    keberatan:state.keberatan,kelasAnak:state.kelasAnak,
     skor:state.skorAkhir,timestamp:new Date().toLocaleString('id-ID'),id:String(Date.now())
   };
   dataGuru=JSON.parse(localStorage.getItem("data_wali_kelas_sdn1")||"[]");
@@ -852,11 +940,12 @@ async function hitungSkor(){
   localStorage.setItem("data_wali_kelas_sdn1",JSON.stringify(dataGuru));
   document.getElementById('skor-akhir').textContent=state.skorAkhir;
   let pesan='Data Anda telah disimpan. Hasil penempatan wali kelas akan diumumkan oleh Kepala Sekolah.';
-  if(state.bendahara) pesan='Karena Anda adalah Bendahara Komite, Anda akan dipertimbangkan untuk wali kelas 1 atau 2 saja.';
-  if(state.keberatan&&state.kelasAnak) pesan+=` Kelas ${state.kelasAnak} dikecualikan dari penempatan Anda.`;
+  if(state.bendahara) pesan='Karena Anda adalah Bendahara BOS, Anda akan dipertimbangkan untuk wali kelas 1 atau 2 saja berdasarkan skor asesmen.';
+  if(state.punyaAnak && state.kelasAnak && state.kelasAnak.length>0){
+    pesan += ` ${state.kelasAnak.map(k=>'Kelas '+k).join(' dan ')} dikecualikan dari penempatan Anda karena ada anak Anda di kelas tersebut.`;
+  }
   document.getElementById('pesan-selesai').textContent=pesan;
   showScreen('screen-selesai');
-  // Otomatis kirim ke Google Sheet
   await kirimEntryKeSheet(entry);
 }
 
@@ -935,27 +1024,77 @@ function loginKepsek(){
 function logoutKepsek(){showScreen('screen-role');}
 
 function tentukanKelas(data){
-  data.sort((a,b)=>a.skor-b.skor);
-  const bendahara=data.filter(d=>d.bendahara);
-  const bukan=data.filter(d=>!d.bendahara);
-  const kelasBendahara=[1,2];
-  const kelasBukan=[1,2,3,4,5,6];
-  function tempatkan(daftar,kelasPool){
-    const hasil=[];const kelasDigunakan=new Set();
+  // Urutkan dari skor tertinggi ke terendah agar guru terbaik mendapat prioritas
+  data.sort((a,b)=>b.skor-a.skor);
+
+  // Normalisasi kelasAnak: bisa array (baru) atau angka/null (data lama)
+  data.forEach(g=>{
+    if(!Array.isArray(g.kelasAnak)){
+      g.kelasAnak = g.kelasAnak!=null && g.kelasAnak!=='' ? [Number(g.kelasAnak)] : [];
+    }
+    // Fix 4: Guru yang punya anak SELALU dikecualikan dari kelas anaknya,
+    // tidak peduli jawaban keberatan
+    if(g.punyaAnak && g.kelasAnak.length>0){
+      g._excludedKelas = new Set(g.kelasAnak.map(Number));
+    } else {
+      g._excludedKelas = new Set();
+    }
+  });
+
+  const bendahara = data.filter(d=>d.bendahara);
+  const bukan     = data.filter(d=>!d.bendahara);
+
+  // Bendahara BOS: hanya kelas 1 & 2, diranking berdasarkan skor (sudah diurutkan di atas)
+  const kelasBendahara = [1,2];
+  // Non-bendahara: semua kelas (kelas 1 & 2 hanya tersedia jika tidak diambil bendahara)
+  const kelasSemua = [1,2,3,4,5,6];
+
+  function tempatkan(daftar, kelasPool, kelasDigunakan){
+    const hasil=[];
     daftar.forEach(g=>{
-      const excluded=new Set(g.keberatan&&g.kelasAnak?[g.kelasAnak]:[]);
+      // Prioritas 1: tidak terpakai DAN tidak ada anak di kelas tsb
       let kelas=null;
-      for(const k of kelasPool){if(!kelasDigunakan.has(k)&&!excluded.has(k)){kelas=k;break;}}
-      if(kelas===null){for(const k of kelasPool){if(!kelasDigunakan.has(k)){kelas=k;break;}}}
-      if(kelas===null)kelas=kelasPool[kelasPool.length-1];
-      g.kelas_assigned=kelas;kelasDigunakan.add(kelas);hasil.push(g);
+      for(const k of kelasPool){
+        if(!kelasDigunakan.has(k) && !g._excludedKelas.has(k)){
+          kelas=k;break;
+        }
+      }
+      // Prioritas 2: semua kelas kosong sudah terpakai →
+      // cari kelas yang belum terpakai, TETAP hindari kelas anak
+      if(kelas===null){
+        for(const k of kelasPool){
+          if(!kelasDigunakan.has(k) && !g._excludedKelas.has(k)){
+            kelas=k;break;
+          }
+        }
+      }
+      // Prioritas 3: semua kelas sudah terpakai, tapi masih ada kelas tanpa anak
+      // (kelas terpakai guru lain boleh di-share hanya jika terpaksa)
+      if(kelas===null){
+        for(const k of kelasPool){
+          if(!g._excludedKelas.has(k)){kelas=k;break;}
+        }
+      }
+      // Fallback terakhir: benar-benar semua kelas adalah kelas anak
+      // (kondisi sangat jarang — lebih banyak kelas daripada guru)
+      if(kelas===null){
+        for(const k of kelasPool){
+          if(!kelasDigunakan.has(k)){kelas=k;break;}
+        }
+      }
+      if(kelas===null) kelas=kelasPool[kelasPool.length-1];
+      g.kelas_assigned=kelas;
+      kelasDigunakan.add(kelas);
+      hasil.push(g);
     });
     return hasil;
   }
-  const hasilBendahara=tempatkan(bendahara,kelasBendahara);
-  const kelasTerpakai=new Set(hasilBendahara.map(g=>g.kelas_assigned));
-  const poolBukan=bendahara.length>0?kelasBukan.filter(k=>!kelasTerpakai.has(k)):kelasBukan;
-  const hasilBukan=tempatkan(bukan,poolBukan.length>0?poolBukan:kelasBukan);
+
+  const kelasDigunakan = new Set();
+  const hasilBendahara = tempatkan(bendahara, kelasBendahara, kelasDigunakan);
+  // Non-bendahara bisa mengambil semua kelas yang belum terpakai
+  const hasilBukan = tempatkan(bukan, kelasSemua, kelasDigunakan);
+
   return [...hasilBendahara,...hasilBukan].sort((a,b)=>a.kelas_assigned-b.kelas_assigned);
 }
 
@@ -967,11 +1106,11 @@ function tampilkanDashboard(){
   const data=tentukanKelas(JSON.parse(JSON.stringify(raw)));
   const avgSkor=Math.round(data.reduce((a,b)=>a+b.skor,0)/data.length);
   const bendaharaCount=data.filter(d=>d.bendahara).length;
-  const anakCount=data.filter(d=>d.keberatan&&d.kelasAnak).length;
+  const anakCount=data.filter(d=>d.punyaAnak&&Array.isArray(d.kelasAnak)&&d.kelasAnak.length>0).length;
   document.getElementById('stats-row').innerHTML=`
     <div class="stat-card"><div class="stat-num">${data.length}</div><div class="stat-label">Total Guru</div></div>
     <div class="stat-card"><div class="stat-num">${avgSkor}</div><div class="stat-label">Rata-rata Skor</div></div>
-    <div class="stat-card"><div class="stat-num">${bendaharaCount}</div><div class="stat-label">Bendahara</div></div>
+    <div class="stat-card"><div class="stat-num">${bendaharaCount}</div><div class="stat-label">Bendahara BOS</div></div>
     <div class="stat-card"><div class="stat-num">${anakCount}</div><div class="stat-label">Ada Anak di Sekolah</div></div>`;
   const kelasClass={1:'kelas-1',2:'kelas-2',3:'kelas-3',4:'kelas-4',5:'kelas-5',6:'kelas-6'};
   const grouped={};
@@ -982,18 +1121,27 @@ function tampilkanDashboard(){
     html+=`<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#fafafa">
       <span class="kelas-badge ${kelasClass[k]}" style="margin-top:2px;white-space:nowrap">Kelas ${k}</span>
       <div style="flex:1">${list.length>0
-        ?list.map(g=>`<div style="font-size:14px;color:#1e293b;margin-bottom:2px">${g.nama}<span style="font-size:12px;color:#64748b;margin-left:4px">Skor: ${g.skor}${g.bendahara?' · <span style="color:#92400e">Bendahara</span>':''}${g.keberatan&&g.kelasAnak?' · <span style="color:#1d4ed8">Anak Kelas '+g.kelasAnak+'</span>':''}</span></div>`).join('')
+        ?list.map(g=>{
+          const kelasAnakArr = Array.isArray(g.kelasAnak)?g.kelasAnak:(g.kelasAnak?[g.kelasAnak]:[]);
+          return `<div style="font-size:14px;color:#1e293b;margin-bottom:2px">${g.nama}<span style="font-size:12px;color:#64748b;margin-left:4px">Skor: ${g.skor}${g.bendahara?' · <span style="color:#92400e">Bendahara BOS</span>':''}${g.punyaAnak&&kelasAnakArr.length>0?' · <span style="color:#1d4ed8">Anak: Kelas '+kelasAnakArr.join(', ')+'</span>':''}</span></div>`;
+        }).join('')
         :'<span style="font-size:13px;color:#94a3b8">Belum ada guru</span>'}</div></div>`;
   });
   html+='</div>';
   document.getElementById('rekap-penempatan').innerHTML=html;
-  document.getElementById('tabel-detail').innerHTML=`<thead><tr><th>No</th><th>Nama Guru</th><th>NIP</th><th>Skor</th><th>Bendahara</th><th>Anak di Kelas</th><th>Kelas</th><th>Waktu</th></tr></thead>
-    <tbody>${data.map((g,i)=>`<tr><td>${i+1}</td><td>${g.nama}</td><td>${g.nip||'-'}</td>
-      <td style="font-weight:600">${g.skor}</td>
-      <td>${g.bendahara?'<span class="badge badge-amber">Ya</span>':'Tidak'}</td>
-      <td>${g.keberatan&&g.kelasAnak?`<span class="kelas-badge ${kelasClass[g.kelasAnak]}">Kelas ${g.kelasAnak}</span>`:'–'}</td>
-      <td><span class="kelas-badge ${kelasClass[g.kelas_assigned]}">Kelas ${g.kelas_assigned}</span></td>
-      <td style="color:#64748b;font-size:12px">${g.timestamp}</td></tr>`).join('')}</tbody>`;
+  document.getElementById('tabel-detail').innerHTML=`<thead><tr><th>No</th><th>Nama Guru</th><th>NIP</th><th>Skor</th><th>Bendahara BOS</th><th>Anak di Kelas</th><th>Kelas</th><th>Waktu</th></tr></thead>
+    <tbody>${data.map((g,i)=>{
+      const kelasAnakArr = Array.isArray(g.kelasAnak)?g.kelasAnak:(g.kelasAnak?[g.kelasAnak]:[]);
+      const kelasAnakHtml = kelasAnakArr.length>0
+        ? kelasAnakArr.map(k=>`<span class="kelas-badge ${kelasClass[k]||''}">Kelas ${k}</span>`).join(' ')
+        : '–';
+      return `<tr><td>${i+1}</td><td>${g.nama}</td><td>${g.nip||'-'}</td>
+        <td style="font-weight:600">${g.skor}</td>
+        <td>${g.bendahara?'<span class="badge badge-amber">Ya</span>':'Tidak'}</td>
+        <td>${kelasAnakHtml}</td>
+        <td><span class="kelas-badge ${kelasClass[g.kelas_assigned]}">Kelas ${g.kelas_assigned}</span></td>
+        <td style="color:#64748b;font-size:12px">${g.timestamp}</td></tr>`;
+    }).join('')}</tbody>`;
 }
 
 function switchTab(tabId,btnId){
@@ -1026,6 +1174,153 @@ function hapusSemuaData(){
   localStorage.removeItem("data_wali_kelas_sdn1");
   dataGuru=[];
   tampilkanDashboard();
+}
+
+// ========================================
+// RESET ASESMEN — TAB ADMIN
+// ========================================
+function renderResetList(){
+  const cont = document.getElementById('reset-asesmen-list');
+  const raw = JSON.parse(localStorage.getItem("data_wali_kelas_sdn1")||"[]");
+  const guruList = getGURU();
+  const kelasClass={1:'kelas-1',2:'kelas-2',3:'kelas-3',4:'kelas-4',5:'kelas-5',6:'kelas-6'};
+
+  if(raw.length===0){
+    cont.innerHTML='<div class="alert alert-info"><i class="ti ti-info-circle"></i> Belum ada data asesmen. Semua guru bisa ikut asesmen.</div>';
+    return;
+  }
+
+  // Gabungkan: semua guru terdaftar, tandai yang sudah asesmen
+  const asesmenByNama = {};
+  raw.forEach(d=>{ asesmenByNama[d.nama.trim().toLowerCase()] = d; });
+
+  // Tampilkan semua guru yang SUDAH asesmen
+  const sudahAsesmen = raw.slice().sort((a,b)=>a.nama.localeCompare(b.nama));
+
+  let html = `<div style="font-size:12px;color:#64748b;margin-bottom:10px">
+    Menampilkan <strong>${sudahAsesmen.length}</strong> guru yang sudah mengikuti asesmen.
+    Klik tombol <span style="color:#991b1b;font-weight:600">Reset</span> untuk menghapus asesmen guru tersebut.
+  </div>`;
+
+  sudahAsesmen.forEach(d=>{
+    const kelasAnakArr = Array.isArray(d.kelasAnak)?d.kelasAnak:(d.kelasAnak?[d.kelasAnak]:[]);
+    const inisial = d.nama.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase();
+    const skor = d.skor;
+    const skorColor = skor>=70?'#166534':skor>=50?'#92400e':'#991b1b';
+    const skorBg   = skor>=70?'#dcfce7':skor>=50?'#fef3c7':'#fee2e2';
+    const idSafe = CSS.escape(d.id);
+
+    html += `<div class="list-item" id="reset-item-${d.id}" style="border-left:3px solid #e2e8f0;gap:10px">
+      <div class="guru-avatar" style="flex-shrink:0">${inisial}</div>
+      <div class="list-item-info">
+        <div class="list-item-name">${d.nama}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;align-items:center">
+          <span style="font-size:12px;background:${skorBg};color:${skorColor};padding:2px 8px;border-radius:12px;font-weight:600">Skor: ${skor}</span>
+          ${d.bendahara?'<span class="badge badge-amber" style="font-size:11px">Bendahara BOS</span>':''}
+          ${kelasAnakArr.length>0?`<span class="badge badge-blue" style="font-size:11px">Anak: Kelas ${kelasAnakArr.join(', ')}</span>`:''}
+          <span style="font-size:11px;color:#94a3b8">${d.timestamp||''}</span>
+        </div>
+      </div>
+      <div class="list-item-actions">
+        <button class="btn btn-sm" style="color:#991b1b;border-color:#fecaca;white-space:nowrap"
+          onclick="resetSatuAsesmen('${d.id}','${d.nama.replace(/'/g,"\\'")}')">
+          <i class="ti ti-user-x"></i> Reset
+        </button>
+      </div>
+    </div>`;
+  });
+
+  cont.innerHTML = html;
+}
+
+async function resetSatuAsesmen(id, nama){
+  if(!confirm(`Reset asesmen "${nama}"?\n\nGuru ini akan bisa mengikuti asesmen kembali. Data juga akan dihapus dari Google Sheet.`)) return;
+
+  const statusEl = document.getElementById('reset-asesmen-status');
+  statusEl.style.display='block';
+  statusEl.className='alert alert-info';
+  statusEl.innerHTML='<i class="ti ti-loader ti-spin"></i> Menghapus data asesmen dari lokal & Google Sheet…';
+
+  // Hapus dari localStorage
+  const raw = JSON.parse(localStorage.getItem("data_wali_kelas_sdn1")||"[]");
+  const baru = raw.filter(d=>String(d.id)!==String(id));
+  localStorage.setItem("data_wali_kelas_sdn1", JSON.stringify(baru));
+
+  // Kirim rekap terbaru ke Google Sheet (setelah dihapus)
+  let sheetOk = false;
+  try{
+    // 1. Hapus entry asesmen dari sheet dengan action deleteAsesmen
+    await fetch(GAS_URL_HARDCODED,{
+      method:'POST',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'deleteAsesmen', data:{id:String(id)}})
+    });
+    // 2. Kirim ulang rekap penempatan yang sudah diperbarui
+    if(baru.length>0){
+      const rekap = tentukanKelas(JSON.parse(JSON.stringify(baru)));
+      await fetch(GAS_URL_HARDCODED,{
+        method:'POST',headers:{'Content-Type':'text/plain'},
+        body:JSON.stringify({action:'simpanRekap', data:rekap})
+      });
+    } else {
+      // Rekap kosong — kirim array kosong agar sheet dibersihkan
+      await fetch(GAS_URL_HARDCODED,{
+        method:'POST',headers:{'Content-Type':'text/plain'},
+        body:JSON.stringify({action:'simpanRekap', data:[]})
+      });
+    }
+    sheetOk = true;
+  }catch(e){ sheetOk = false; }
+
+  if(sheetOk){
+    statusEl.className='alert alert-success';
+    statusEl.innerHTML=`<i class="ti ti-circle-check"></i> Asesmen <strong>${nama}</strong> berhasil direset. Data telah diperbarui di Google Sheet.`;
+  } else {
+    statusEl.className='alert alert-warning';
+    statusEl.innerHTML=`<i class="ti ti-alert-triangle"></i> Asesmen <strong>${nama}</strong> dihapus dari perangkat ini, namun Google Sheet gagal diperbarui (cek koneksi internet).`;
+  }
+
+  setTimeout(()=>{ statusEl.style.display='none'; }, 6000);
+  renderResetList();
+}
+
+async function resetSemuaAsesmen(){
+  const raw = JSON.parse(localStorage.getItem("data_wali_kelas_sdn1")||"[]");
+  if(raw.length===0){ alert("Tidak ada data asesmen untuk direset."); return; }
+  if(!confirm(`Reset SEMUA asesmen (${raw.length} guru)?\n\nSeluruh data asesmen akan dihapus dari perangkat ini dan Google Sheet. Semua guru bisa ikut asesmen kembali.`)) return;
+
+  const statusEl = document.getElementById('reset-asesmen-status');
+  statusEl.style.display='block';
+  statusEl.className='alert alert-info';
+  statusEl.innerHTML='<i class="ti ti-loader ti-spin"></i> Menghapus semua data asesmen…';
+
+  // Hapus semua dari localStorage
+  localStorage.removeItem("data_wali_kelas_sdn1");
+  dataGuru=[];
+
+  // Bersihkan sheet
+  let sheetOk = false;
+  try{
+    await fetch(GAS_URL_HARDCODED,{
+      method:'POST',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'resetSemuaAsesmen'})
+    });
+    await fetch(GAS_URL_HARDCODED,{
+      method:'POST',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'simpanRekap', data:[]})
+    });
+    sheetOk=true;
+  }catch(e){ sheetOk=false; }
+
+  if(sheetOk){
+    statusEl.className='alert alert-success';
+    statusEl.innerHTML='<i class="ti ti-circle-check"></i> Semua data asesmen berhasil direset. Google Sheet telah diperbarui.';
+  } else {
+    statusEl.className='alert alert-warning';
+    statusEl.innerHTML='<i class="ti ti-alert-triangle"></i> Data dihapus dari perangkat ini, namun Google Sheet gagal diperbarui (cek koneksi internet).';
+  }
+
+  setTimeout(()=>{ statusEl.style.display='none'; }, 6000);
+  renderResetList();
 }
 
 async function muatUlangDashboard(){
@@ -1073,9 +1368,10 @@ function loginAdmin(){
 function logoutAdmin(){showScreen('screen-role');}
 
 function switchAdminTab(tabId,btnId){
-  ['atab-guru','atab-kelas','atab-soal','atab-setting'].forEach(id=>{document.getElementById(id).style.display=id===tabId?'block':'none';});
+  ['atab-guru','atab-kelas','atab-soal','atab-reset','atab-setting'].forEach(id=>{document.getElementById(id).style.display=id===tabId?'block':'none';});
   document.querySelectorAll('#screen-admin .tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(btnId).classList.add('active');
+  if(tabId==='atab-reset') renderResetList();
 }
 
 function initAdminPanel(){
@@ -1350,10 +1646,11 @@ function closeModal(id){
 }
 
 function resetApp(){
-  state={nama:"",nip:"",namaTerpilih:"",bendahara:false,punyaAnak:false,keberatan:false,kelasAnak:null,soalIdx:0,jawaban:[],skorAkhir:0,soalAktif:[]};
+  state={nama:"",nip:"",namaTerpilih:"",bendahara:false,punyaAnak:false,jumlahAnak:1,keberatan:false,kelasAnak:[],soalIdx:0,jawaban:[],skorAkhir:0,soalAktif:[]};
   document.getElementById('nip-guru').value='';
   document.querySelectorAll('input[name=bend],input[name=anak],input[name=keberatan]').forEach(r=>r.checked=false);
   document.querySelectorAll('.opsi-label').forEach(l=>l.classList.remove('selected'));
+  document.getElementById('jumlah-anak-wrap').style.display='none';
   renderGuruSelect();
   showScreen('screen-role');
 }
