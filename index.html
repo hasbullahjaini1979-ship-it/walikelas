@@ -337,13 +337,27 @@ input:checked+.toggle-slider:before{transform:translateX(20px)}
       <span id="soal-badge" class="badge badge-blue">Matematika</span>
       <span class="meta" id="soal-counter">Soal 1 dari 10</span>
     </div>
-    <div class="progress-wrap">
-      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:10%"></div></div>
+    <div class="row" style="margin-bottom:8px;justify-content:space-between;align-items:center">
+      <div class="progress-wrap" style="flex:1;margin:0">
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:10%"></div></div>
+      </div>
+      <span class="badge badge-amber" id="timer-display" style="display:none;margin-left:10px;white-space:nowrap"><i class="ti ti-clock"></i> 00:00</span>
     </div>
     <p class="soal-text" id="soal-text"></p>
     <div id="opsi-container"></div>
-    <div class="row" style="margin-top:16px;justify-content:flex-end">
+
+    <div class="row" style="margin-top:16px;justify-content:space-between">
+      <button class="btn" id="btn-soal-sebelumnya" onclick="soalSebelumnya()"><i class="ti ti-arrow-left"></i> Sebelumnya</button>
       <button class="btn btn-primary" id="btn-soal-lanjut" onclick="jawabanBerikutnya()">Berikutnya <i class="ti ti-arrow-right"></i></button>
+    </div>
+
+    <hr class="divider">
+    <div style="font-size:12px;color:#64748b;margin-bottom:8px"><i class="ti ti-list-numbers"></i> Navigasi Soal — klik nomor untuk pindah</div>
+    <div id="soal-navigator" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(36px,1fr));gap:6px"></div>
+    <div class="row" style="margin-top:10px;gap:14px;flex-wrap:wrap">
+      <span style="font-size:12px;color:#64748b"><span style="display:inline-block;width:12px;height:12px;background:#dcfce7;border:1px solid #86efac;border-radius:3px;vertical-align:middle;margin-right:4px"></span>Sudah dijawab</span>
+      <span style="font-size:12px;color:#64748b"><span style="display:inline-block;width:12px;height:12px;background:#dbeafe;border:1px solid #185fa5;border-radius:3px;vertical-align:middle;margin-right:4px"></span>Sedang dikerjakan</span>
+      <span style="font-size:12px;color:#64748b"><span style="display:inline-block;width:12px;height:12px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:3px;vertical-align:middle;margin-right:4px"></span>Belum dijawab</span>
     </div>
   </div>
 </div>
@@ -548,6 +562,11 @@ input:checked+.toggle-slider:before{transform:translateX(20px)}
             <span class="toggle-slider"></span>
           </label>
         </div>
+        <div class="toggle-row" style="display:block">
+          <label class="field-label" style="margin-top:8px">Waktu Pengerjaan Soal (menit)</label>
+          <div class="toggle-sub" style="margin-bottom:8px">Kosongkan atau isi 0 untuk tanpa batas waktu</div>
+          <input type="text" id="setting-waktu-soal" placeholder="0" inputmode="numeric" onchange="saveSetting()" style="max-width:120px">
+        </div>
       </div>
       <div class="admin-section">
         <h3><i class="ti ti-link" style="color:#185fa5"></i> Konfigurasi Google Sheet</h3>
@@ -583,14 +602,15 @@ input:checked+.toggle-slider:before{transform:translateX(20px)}
 // ========================================
 // KONFIGURASI DEFAULT
 // ========================================
-const GAS_URL_HARDCODED = "https://script.google.com/macros/s/AKfycbxpmAVrwrIXsaUavlPwoYNDgWldxeIE0Zb1pcoN4AuiFeq5A5WhudE1iNeqJO_TzDk5kA/exec";
+const GAS_URL_HARDCODED = "https://script.google.com/macros/s/AKfycbwlJ4S03jnOM9nXek40b-KtM1fn6ntcjf-yYOtDyvfEESFGAkwNW96-pT40Cp6pizORZA/exec";
 
 let CONFIG = {
   GS_URL: GAS_URL_HARDCODED,
   KEPSEK_PASS: "sdn1raja2025",
   ADMIN_PASS: "admin2025",
   acakSoal: false,
-  acakOpsi: false
+  acakOpsi: false,
+  waktuSoal: 0  // dalam menit; 0 = tanpa batas waktu
 };
 
 // ========================================
@@ -688,6 +708,15 @@ async function tarikDataSplash(){
     if(json.guru && json.guru.length > 0) saveGURU(json.guru);
     if(json.kelas && json.kelas.length > 0) saveKELAS(json.kelas);
     if(json.soal && json.soal.length > 0) saveSOAL(json.soal);
+    if(json.config){
+      const cfg=getCONFIG();
+      if(json.config.acakSoal!==undefined) cfg.acakSoal = json.config.acakSoal==='1'||json.config.acakSoal===true;
+      if(json.config.acakOpsi!==undefined) cfg.acakOpsi = json.config.acakOpsi==='1'||json.config.acakOpsi===true;
+      if(json.config.waktuSoal!==undefined) cfg.waktuSoal = parseInt(json.config.waktuSoal,10)||0;
+      if(json.config.KEPSEK_PASS) cfg.KEPSEK_PASS = json.config.KEPSEK_PASS;
+      if(json.config.ADMIN_PASS) cfg.ADMIN_PASS = json.config.ADMIN_PASS;
+      saveCONFIG(cfg);
+    }
     if(json.asesmen && json.asesmen.length > 0){
       // Gabungkan data asesmen dari sheet dengan data lokal (hindari duplikat by id)
       const lokal = JSON.parse(localStorage.getItem("data_wali_kelas_sdn1")||"[]");
@@ -887,6 +916,49 @@ function mulaiSoalSekarang(){
   state.soalAktif = soalList;
   state.soalIdx=0;state.jawaban=[];
   tampilkanSoal();showScreen('screen-soal');
+  mulaiTimerSoal(cfg.waktuSoal);
+}
+
+// ========================================
+// TIMER PENGERJAAN SOAL
+// ========================================
+let timerInterval = null;
+let timerSisaDetik = 0;
+
+function mulaiTimerSoal(menit){
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  const el=document.getElementById('timer-display');
+  if(!menit || menit<=0){
+    el.style.display='none';
+    return;
+  }
+  timerSisaDetik = menit*60;
+  el.style.display='inline-block';
+  updateTimerDisplay();
+  timerInterval = setInterval(()=>{
+    timerSisaDetik--;
+    updateTimerDisplay();
+    if(timerSisaDetik<=0){
+      clearInterval(timerInterval);timerInterval=null;
+      alert("Waktu pengerjaan telah selesai. Jawaban akan disimpan secara otomatis.");
+      hitungSkor(true);
+    }
+  },1000);
+}
+
+function updateTimerDisplay(){
+  const el=document.getElementById('timer-display');
+  const m=Math.floor(timerSisaDetik/60);
+  const s=timerSisaDetik%60;
+  el.innerHTML=`<i class="ti ti-clock"></i> ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  if(timerSisaDetik<=60){el.className='badge badge-red';}
+  else if(timerSisaDetik<=300){el.className='badge badge-amber';}
+  else{el.className='badge badge-blue';}
+}
+
+function hentikanTimerSoal(){
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  document.getElementById('timer-display').style.display='none';
 }
 
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
@@ -909,23 +981,64 @@ function tampilkanSoal(){
     lbl.onclick=()=>{
       document.querySelectorAll('.opsi-label').forEach(l=>l.classList.remove('selected'));
       lbl.classList.add('selected');state.jawaban[state.soalIdx]=i;
+      renderSoalNavigator();
     };
     cont.appendChild(lbl);
   });
   const btn=document.getElementById('btn-soal-lanjut');
   btn.innerHTML=state.soalIdx<soal.length-1?'Berikutnya <i class="ti ti-arrow-right"></i>':'Selesai <i class="ti ti-check"></i>';
+
+  const btnPrev=document.getElementById('btn-soal-sebelumnya');
+  btnPrev.disabled = state.soalIdx===0;
+  btnPrev.style.opacity = state.soalIdx===0 ? '0.5' : '1';
+  btnPrev.style.cursor = state.soalIdx===0 ? 'not-allowed' : 'pointer';
+
+  renderSoalNavigator();
+}
+
+function renderSoalNavigator(){
+  const soal=state.soalAktif;
+  const cont=document.getElementById('soal-navigator');
+  cont.innerHTML = soal.map((s,i)=>{
+    const dijawab = state.jawaban[i]!==undefined;
+    const aktif = i===state.soalIdx;
+    let bg='#f1f5f9', border='#e2e8f0', color='#64748b';
+    if(aktif){bg='#dbeafe';border='#185fa5';color='#1e3a5f';}
+    else if(dijawab){bg='#dcfce7';border='#86efac';color='#166534';}
+    return `<button class="btn btn-sm" style="padding:6px 0;justify-content:center;background:${bg};border-color:${border};color:${color};font-weight:600" onclick="lompatKeSoal(${i})">${i+1}</button>`;
+  }).join('');
+}
+
+function lompatKeSoal(i){
+  // Simpan jawaban yang sedang dipilih sebelum pindah
+  const pilihan=document.querySelector('input[name=opsi]:checked');
+  if(pilihan) state.jawaban[state.soalIdx]=parseInt(pilihan.value);
+  state.soalIdx=i;
+  tampilkanSoal();
+}
+
+function soalSebelumnya(){
+  const pilihan=document.querySelector('input[name=opsi]:checked');
+  if(pilihan) state.jawaban[state.soalIdx]=parseInt(pilihan.value);
+  if(state.soalIdx>0){state.soalIdx--;tampilkanSoal();}
 }
 
 function jawabanBerikutnya(){
   const pilihan=document.querySelector('input[name=opsi]:checked');
   if(pilihan) state.jawaban[state.soalIdx]=parseInt(pilihan.value);
-  if(state.jawaban[state.soalIdx]===undefined){alert("Pilih jawaban terlebih dahulu.");return;}
   if(state.soalIdx<state.soalAktif.length-1){state.soalIdx++;tampilkanSoal();}
   else hitungSkor();
 }
 
-async function hitungSkor(){
+async function hitungSkor(skipConfirm){
   const soal = state.soalAktif;
+  const belumTerjawab = soal.filter((s,i)=>state.jawaban[i]===undefined).length;
+  if(belumTerjawab>0 && !skipConfirm){
+    if(!confirm(`Masih ada ${belumTerjawab} soal yang belum dijawab. Soal yang belum dijawab dianggap salah. Selesaikan asesmen sekarang?`)) {
+      return;
+    }
+  }
+  hentikanTimerSoal();
   let benar=0;
   soal.forEach((s,i)=>{if(state.jawaban[i]===s.jawaban)benar++;});
   state.skorAkhir=Math.round((benar/soal.length)*100);
@@ -1024,7 +1137,7 @@ function loginKepsek(){
 function logoutKepsek(){showScreen('screen-role');}
 
 function tentukanKelas(data){
-  // Urutkan dari skor tertinggi ke terendah agar guru terbaik mendapat prioritas
+  // Urutkan dari skor tertinggi ke terendah
   data.sort((a,b)=>b.skor-a.skor);
 
   // Normalisasi kelasAnak: bisa array (baru) atau angka/null (data lama)
@@ -1032,9 +1145,8 @@ function tentukanKelas(data){
     if(!Array.isArray(g.kelasAnak)){
       g.kelasAnak = g.kelasAnak!=null && g.kelasAnak!=='' ? [Number(g.kelasAnak)] : [];
     }
-    // Fix 4: Guru yang punya anak SELALU dikecualikan dari kelas anaknya,
-    // tidak peduli jawaban keberatan
-    if(g.punyaAnak && g.kelasAnak.length>0){
+    // Guru yang punya anak & keberatan mengajar di kelas anaknya → kelas tsb dikecualikan
+    if(g.punyaAnak && g.keberatan && g.kelasAnak.length>0){
       g._excludedKelas = new Set(g.kelasAnak.map(Number));
     } else {
       g._excludedKelas = new Set();
@@ -1044,45 +1156,41 @@ function tentukanKelas(data){
   const bendahara = data.filter(d=>d.bendahara);
   const bukan     = data.filter(d=>!d.bendahara);
 
-  // Bendahara BOS: hanya kelas 1 & 2, diranking berdasarkan skor (sudah diurutkan di atas)
   const kelasBendahara = [1,2];
-  // Non-bendahara: semua kelas (kelas 1 & 2 hanya tersedia jika tidak diambil bendahara)
   const kelasSemua = [1,2,3,4,5,6];
 
-  function tempatkan(daftar, kelasPool, kelasDigunakan){
+  // Penempatan dasar: skor TINGGI -> kelas TINGGI (6), skor RENDAH -> kelas RENDAH (1).
+  // Non-bendahara diurutkan dari skor TERENDAH ke TERTINGGI lalu kelas dibagikan
+  // berurutan 1..6 dari pool kelas yang tersedia (terkecil ke terbesar),
+  // sehingga skor rendah mendapat kelas kecil & skor tinggi mendapat kelas besar.
+  function tempatkan(daftarUrutKelasNaik, kelasPoolNaik, kelasDigunakan){
     const hasil=[];
-    daftar.forEach(g=>{
-      // Prioritas 1: tidak terpakai DAN tidak ada anak di kelas tsb
+    const poolTersisa = kelasPoolNaik.filter(k=>!kelasDigunakan.has(k));
+    let pointer = 0;
+
+    daftarUrutKelasNaik.forEach(g=>{
       let kelas=null;
-      for(const k of kelasPool){
-        if(!kelasDigunakan.has(k) && !g._excludedKelas.has(k)){
-          kelas=k;break;
-        }
+
+      // Prioritas 1: kelas berikutnya dalam urutan, bukan kelas anak guru tsb
+      for(let i=pointer;i<poolTersisa.length;i++){
+        const k=poolTersisa[i];
+        if(!kelasDigunakan.has(k) && !g._excludedKelas.has(k)){ kelas=k; pointer=i; break; }
       }
-      // Prioritas 2: semua kelas kosong sudah terpakai →
-      // cari kelas yang belum terpakai, TETAP hindari kelas anak
+      // Prioritas 2: kelas mana pun di pool yang belum terpakai & bukan kelas anak
       if(kelas===null){
-        for(const k of kelasPool){
-          if(!kelasDigunakan.has(k) && !g._excludedKelas.has(k)){
-            kelas=k;break;
-          }
+        for(const k of kelasPoolNaik){
+          if(!kelasDigunakan.has(k) && !g._excludedKelas.has(k)){ kelas=k; break; }
         }
       }
-      // Prioritas 3: semua kelas sudah terpakai, tapi masih ada kelas tanpa anak
-      // (kelas terpakai guru lain boleh di-share hanya jika terpaksa)
+      // Prioritas 3: kelas belum terpakai meski itu kelas anak (terpaksa)
       if(kelas===null){
-        for(const k of kelasPool){
-          if(!g._excludedKelas.has(k)){kelas=k;break;}
+        for(const k of kelasPoolNaik){
+          if(!kelasDigunakan.has(k)){ kelas=k; break; }
         }
       }
-      // Fallback terakhir: benar-benar semua kelas adalah kelas anak
-      // (kondisi sangat jarang — lebih banyak kelas daripada guru)
-      if(kelas===null){
-        for(const k of kelasPool){
-          if(!kelasDigunakan.has(k)){kelas=k;break;}
-        }
-      }
-      if(kelas===null) kelas=kelasPool[kelasPool.length-1];
+      // Fallback terakhir
+      if(kelas===null) kelas=kelasPoolNaik[kelasPoolNaik.length-1];
+
       g.kelas_assigned=kelas;
       kelasDigunakan.add(kelas);
       hasil.push(g);
@@ -1091,9 +1199,14 @@ function tentukanKelas(data){
   }
 
   const kelasDigunakan = new Set();
-  const hasilBendahara = tempatkan(bendahara, kelasBendahara, kelasDigunakan);
-  // Non-bendahara bisa mengambil semua kelas yang belum terpakai
-  const hasilBukan = tempatkan(bukan, kelasSemua, kelasDigunakan);
+
+  // Bendahara: tetap khusus kelas 1 atau 2, skor lebih tinggi -> kelas 2, lebih rendah -> kelas 1
+  const bendaharaUrutNaik = [...bendahara].sort((a,b)=>a.skor-b.skor);
+  const hasilBendahara = tempatkan(bendaharaUrutNaik, kelasBendahara, kelasDigunakan);
+
+  // Non-bendahara: skor rendah -> kelas 1 (kecil), skor tinggi -> kelas 6 (besar)
+  const bukanUrutNaik = [...bukan].sort((a,b)=>a.skor-b.skor);
+  const hasilBukan = tempatkan(bukanUrutNaik, kelasSemua, kelasDigunakan);
 
   return [...hasilBendahara,...hasilBukan].sort((a,b)=>a.kelas_assigned-b.kelas_assigned);
 }
@@ -1567,6 +1680,7 @@ function loadSettingUI(){
   const cfg=getCONFIG();
   document.getElementById('toggle-acak-soal').checked=!!cfg.acakSoal;
   document.getElementById('toggle-acak-opsi').checked=!!cfg.acakOpsi;
+  document.getElementById('setting-waktu-soal').value=cfg.waktuSoal||0;
   document.getElementById('setting-gs-url').value=cfg.GS_URL||'';
   document.getElementById('setting-kepsek-pass').value=cfg.KEPSEK_PASS||'';
   document.getElementById('setting-admin-pass').value=cfg.ADMIN_PASS||'';
@@ -1576,7 +1690,23 @@ function saveSetting(){
   const cfg=getCONFIG();
   cfg.acakSoal=document.getElementById('toggle-acak-soal').checked;
   cfg.acakOpsi=document.getElementById('toggle-acak-opsi').checked;
+  const waktu=parseInt(document.getElementById('setting-waktu-soal').value,10);
+  cfg.waktuSoal = isNaN(waktu)||waktu<0 ? 0 : waktu;
   saveCONFIG(cfg);
+  syncConfigKeSheet(cfg);
+}
+
+async function syncConfigKeSheet(cfg){
+  try{
+    await fetch(GAS_URL_HARDCODED,{method:'POST',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'simpanConfig',data:{
+        acakSoal: cfg.acakSoal?'1':'0',
+        acakOpsi: cfg.acakOpsi?'1':'0',
+        waktuSoal: cfg.waktuSoal||0,
+        KEPSEK_PASS: cfg.KEPSEK_PASS,
+        ADMIN_PASS: cfg.ADMIN_PASS
+      }})});
+  }catch(e){/* abaikan, akan tersimpan saat koneksi tersedia */}
 }
 
 function saveSettingConfig(){
@@ -1586,7 +1716,10 @@ function saveSettingConfig(){
   cfg.ADMIN_PASS=document.getElementById('setting-admin-pass').value.trim()||cfg.ADMIN_PASS;
   cfg.acakSoal=document.getElementById('toggle-acak-soal').checked;
   cfg.acakOpsi=document.getElementById('toggle-acak-opsi').checked;
+  const waktu=parseInt(document.getElementById('setting-waktu-soal').value,10);
+  cfg.waktuSoal = isNaN(waktu)||waktu<0 ? 0 : waktu;
   saveCONFIG(cfg);
+  syncConfigKeSheet(cfg);
   showSyncStatus('Konfigurasi berhasil disimpan!','success');
 }
 
@@ -1615,6 +1748,16 @@ async function tarikDataDariSheet(){
     if(json.guru && json.guru.length>0) saveGURU(json.guru);
     if(json.kelas && json.kelas.length>0) saveKELAS(json.kelas);
     if(json.soal && json.soal.length>0) saveSOAL(json.soal);
+    if(json.config){
+      const cfg=getCONFIG();
+      if(json.config.acakSoal!==undefined) cfg.acakSoal = json.config.acakSoal==='1'||json.config.acakSoal===true;
+      if(json.config.acakOpsi!==undefined) cfg.acakOpsi = json.config.acakOpsi==='1'||json.config.acakOpsi===true;
+      if(json.config.waktuSoal!==undefined) cfg.waktuSoal = parseInt(json.config.waktuSoal,10)||0;
+      if(json.config.KEPSEK_PASS) cfg.KEPSEK_PASS = json.config.KEPSEK_PASS;
+      if(json.config.ADMIN_PASS) cfg.ADMIN_PASS = json.config.ADMIN_PASS;
+      saveCONFIG(cfg);
+      loadSettingUI();
+    }
     if(json.asesmen && json.asesmen.length>0){
       const lokal=JSON.parse(localStorage.getItem("data_wali_kelas_sdn1")||"[]");
       const lokalIds=new Set(lokal.map(d=>d.id));
@@ -1646,6 +1789,7 @@ function closeModal(id){
 }
 
 function resetApp(){
+  hentikanTimerSoal();
   state={nama:"",nip:"",namaTerpilih:"",bendahara:false,punyaAnak:false,jumlahAnak:1,keberatan:false,kelasAnak:[],soalIdx:0,jawaban:[],skorAkhir:0,soalAktif:[]};
   document.getElementById('nip-guru').value='';
   document.querySelectorAll('input[name=bend],input[name=anak],input[name=keberatan]').forEach(r=>r.checked=false);
